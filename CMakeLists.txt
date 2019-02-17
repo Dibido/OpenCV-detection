@@ -7,5 +7,6 @@ set (CMAKE_CXX_FLAGS "-Wconversion")
 
 project(shapedetector)
 find_package(OpenCV 3.2.0 REQUIRED)
-add_executable(shapedetector main.cpp shapedetector.cpp)
+
+add_executable(shapedetector main.cpp Shapedetector.cpp)
 target_link_libraries(shapedetector ${OpenCV_LIBS})

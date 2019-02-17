@@ -15,15 +15,27 @@ cmake ..
 make
 ```
 ## Arguments
-shapedetector batch.txt
-shapedetector
+Batch:  
+``` Bash
+shapedetector [image] [batchfile]
+```
+Interactive:  
+``` Bash
+shapedetector [image]
+```
 ## Commands
 ### Syntax
+``` Bash
 [form][whitespace][color][newline]
+```
 ### Examples
+``` Bash
 circle red\n
+```
 ### Comments
+``` Bash
 \# This is a comment
+```
 
 ## Output
 ### Interactive mode
