@@ -1,0 +1,3 @@
+# Ignored comment
+square red
+circle blue
