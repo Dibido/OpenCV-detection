@@ -8,9 +8,16 @@
 #ifndef SHAPE_DETECTOR_H_
 #define SHAPE_DETECTOR_H_
 
-#include <ifstream>
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+
+#include <opencv2/opencv.hpp>
+#include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+
+using namespace cv;
 
 /**
  * @brief Enum for the different possible shapes
@@ -88,9 +95,9 @@ inline COLORS StringToColor(std::string aColorString)
   }
 }
 
-inline bool fileExists (const std::string& name) {
-    ifstream f(name.c_str());
-    return f.good();
+inline bool fileExists (const std::string& aFilePath) {
+  std::ifstream f(aFilePath.c_str());
+  return f.good();
 }
 
 class Shapedetector
@@ -99,11 +106,20 @@ class Shapedetector
     Shapedetector(std::string aImageFilePath);
     ~Shapedetector();
 
-    int detectShape(SHAPES aShape);
-    int detectColor(SHAPES aShape);
+    /**
+     * @brief 
+     * @param aShapeCommand 
+     */
+    void handleShapeCommand(const std::string& aShapeCommand);
 
   private:
+    int detectShape(SHAPES aShape);
+    int detectColor(COLORS aShape);
+
+    COLORS mCurrentColor;
+    SHAPES mCurrentShape;
     std::string mImagePath;
+    Mat mOriginalImage;
 };
 
 #endif

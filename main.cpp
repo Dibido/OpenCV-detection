@@ -1,5 +1,6 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <memory>
 
 #include "Shapedetector.h"
 
@@ -8,13 +9,15 @@
 
 const std::string EXIT_COMMAND = "exit";
 
+std::shared_ptr<Shapedetector> detector;
+
 int main(int argc, char** argv)
 {
   if(argc >= INTERACTIVE_ARGCOUNT)
   {
     if(fileExists(argv[1]))
     {
-      Shapedetector detector = Shapedetector(argv[1]);
+      detector = std::make_shared<Shapedetector>(argv[1]);
     }
     else
     {
@@ -44,8 +47,8 @@ int main(int argc, char** argv)
     std::string aCommand;
     while(aCommand != EXIT_COMMAND)
     {
-      std::cin >> aCommand;
-      // TODO: Handle command
+      getline(std::cin, aCommand);
+      detector->handleShapeCommand(aCommand);
       std::cout << "> ";
     }
   }
