@@ -57,6 +57,7 @@ int main(int argc, char** argv)
     std::cout << "Invalid arguments. \n\
       Usage - Interactive: shapedetector [image]\n\
       Batch: shapedetector [image] [batchfile]\n" << std::endl;
+      exit(0);
   }
   return 0;
 }
