@@ -1,7 +1,7 @@
+// Local
 #include "Shapedetector.h"
 
-Shapedetector::Shapedetector(std::string aImageFilePath) :
-    mImagePath(aImageFilePath)
+Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFilePath)
 {
   // Store origininal image
   mOriginalImage = imread(mImagePath);
@@ -14,7 +14,7 @@ Shapedetector::Shapedetector(std::string aImageFilePath) :
   mBlueLimits[0] = Scalar(85, 40, 30);
   mBlueLimits[1] = Scalar(135, 255, 255);
   mGreenLimits[0] = Scalar(40, 40, 40);
-  mGreenLimits[1] = Scalar(75, 255 ,255);
+  mGreenLimits[1] = Scalar(75, 255, 255);
   mRedLimits[0] = Scalar(0, 60, 60);
   mRedLimits[1] = Scalar(10, 255, 255);
   mRedLimits[2] = Scalar(170, 60, 60);
@@ -32,7 +32,7 @@ Shapedetector::~Shapedetector()
 {
 }
 
-void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
+void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 {
   // Show command
   std::cout << aShapeCommand << std::endl;
@@ -46,7 +46,7 @@ void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
 
   mMaskImage = detectColor(mCurrentColor);
   detectShape(mCurrentShape);
-  
+
   imshow("original", mOriginalImage);
   imshow("mask", mMaskImage);
   waitKey(0);
@@ -59,40 +59,40 @@ Mat Shapedetector::detectColor(COLORS aColor)
   Mat resultImage;
   switch (aColor)
   {
-    case COLORS::BLUE:
-    {
-      inRange(mHSVImage, mBlueLimits[0], mBlueLimits[1], resultMask);
-      break;
-    }
-    case COLORS::GREEN:
-    {
-      inRange(mHSVImage, mGreenLimits[0], mGreenLimits[1], resultMask);
-      break;
-    }
-    case COLORS::RED:
-    {
-      inRange(mHSVImage, mRedLimits[0], mRedLimits[1], resultMask);
-      inRange(mHSVImage, mRedLimits[2], mRedLimits[3], tempMask);
-      bitwise_or(resultMask, tempMask, resultMask);
-      break;
-    }
-    case COLORS::BLACK:
-    {
-      break;
-    }
-    case COLORS::YELLOW:
-    {
-      break;
-    }
-    case COLORS::WHITE:
-    {
-      break;
-    }
-    case COLORS::UNKNOWNCOLOR:
-    {
-      std::cout << "ERROR - Unknown color" << std::endl;
-      break;
-    }
+  case COLORS::BLUE:
+  {
+    inRange(mHSVImage, mBlueLimits[0], mBlueLimits[1], resultMask);
+    break;
+  }
+  case COLORS::GREEN:
+  {
+    inRange(mHSVImage, mGreenLimits[0], mGreenLimits[1], resultMask);
+    break;
+  }
+  case COLORS::RED:
+  {
+    inRange(mHSVImage, mRedLimits[0], mRedLimits[1], resultMask);
+    inRange(mHSVImage, mRedLimits[2], mRedLimits[3], tempMask);
+    bitwise_or(resultMask, tempMask, resultMask);
+    break;
+  }
+  case COLORS::BLACK:
+  {
+    break;
+  }
+  case COLORS::YELLOW:
+  {
+    break;
+  }
+  case COLORS::WHITE:
+  {
+    break;
+  }
+  case COLORS::UNKNOWNCOLOR:
+  {
+    std::cout << "ERROR - Unknown color" << std::endl;
+    break;
+  }
   }
   resultMask.copyTo(mCurrentMask);
   mOriginalImage.copyTo(resultImage, resultMask);
@@ -103,52 +103,52 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
 {
   threshold(mGreyImage, mTresholdImage, 0, 255, 0);
   findContours(mTresholdImage, mCurrentContours, CV_RETR_LIST, CHAIN_APPROX_NONE);
-  switch(aShape)
+  switch (aShape)
   {
-    case SHAPES::SQUARE:
+  case SHAPES::SQUARE:
+  {
+    for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      for(int i = 0; i < mCurrentContours.size(); i++)
+      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+      if (mApproxImage.size().height == 4)
       {
-        double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
-        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-        if(mApproxImage.size().height == 4)
-        {
-          drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0,255,0), 3);
-        }
+        drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
       }
-      break;
     }
-    case SHAPES::RECTANGLE:
+    break;
+  }
+  case SHAPES::RECTANGLE:
+  {
+    for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      for(int i = 0; i < mCurrentContours.size(); i++)
+      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+      if (mApproxImage.size().height == 4)
       {
-        double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
-        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-        if(mApproxImage.size().height == 4)
-        {
-          drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0,255,0), 3);
-        }
+        drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
       }
-      break;
     }
-    case SHAPES::TRIANGLE:
+    break;
+  }
+  case SHAPES::TRIANGLE:
+  {
+    for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      for(int i = 0; i < mCurrentContours.size(); i++)
+      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+      if (mApproxImage.size().height == 3)
       {
-        double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
-        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-        if(mApproxImage.size().height == 3)
-        {
-          drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0,255,0), 3);
-        }
+        drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
       }
-      break;
     }
-    case SHAPES::UNKNOWNSHAPE:
-    {
-      std::cout << "ERROR - Unknown shape" << std::endl;
-      break;
-    }
+    break;
+  }
+  case SHAPES::UNKNOWNSHAPE:
+  {
+    std::cout << "ERROR - Unknown shape" << std::endl;
+    break;
+  }
   }
   return mCurrentContours;
 }

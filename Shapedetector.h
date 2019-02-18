@@ -8,15 +8,18 @@
 #ifndef SHAPE_DETECTOR_H_
 #define SHAPE_DETECTOR_H_
 
+// Library
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
-
 #include <opencv2/opencv.hpp>
+
+// Local
 #include "opencv2/imgcodecs.hpp"
 #include "opencv2/highgui.hpp"
 
+// Namespace
 using namespace cv;
 
 /**
