@@ -5,12 +5,13 @@ Shapedetector::Shapedetector(std::string aImageFilePath) :
 {
   // Store origininal image
   mOriginalImage = imread(mImagePath);
+  mOriginalImage.copyTo(mTresholdImage);
   // Convert to necessary formats
   cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
   cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
 
   // Set the color limits for color detection [0] = Min, [1] = Max
-  mBlueLimits[0] = Scalar(85, 60, 40);
+  mBlueLimits[0] = Scalar(85, 40, 30);
   mBlueLimits[1] = Scalar(135, 255, 255);
   mGreenLimits[0] = Scalar(40, 40, 40);
   mGreenLimits[1] = Scalar(75, 255 ,255);
@@ -18,6 +19,12 @@ Shapedetector::Shapedetector(std::string aImageFilePath) :
   mRedLimits[1] = Scalar(10, 255, 255);
   mRedLimits[2] = Scalar(170, 60, 60);
   mRedLimits[3] = Scalar(180, 255, 255);
+  mBlackLimits[0] = Scalar();
+  mBlackLimits[1] = Scalar();
+  mYellowLimits[0] = Scalar();
+  mYellowLimits[1] = Scalar();
+  mWhiteLimits[0] = Scalar(); // Is woodcolor instead of white
+  mWhiteLimits[1] = Scalar();
   // TODO: find the other limits
 }
 
@@ -39,7 +46,6 @@ void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
 
   mMaskImage = detectColor(mCurrentColor);
   detectShape(mCurrentShape);
-
   
   imshow("original", mOriginalImage);
   imshow("mask", mMaskImage);
@@ -88,11 +94,61 @@ Mat Shapedetector::detectColor(COLORS aColor)
       break;
     }
   }
+  resultMask.copyTo(mCurrentMask);
   mOriginalImage.copyTo(resultImage, resultMask);
   return resultImage;
 }
 
-int Shapedetector::detectShape(SHAPES aShape)
+std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
 {
-  //TODO: Implement
+  threshold(mGreyImage, mTresholdImage, 0, 255, 0);
+  findContours(mTresholdImage, mCurrentContours, CV_RETR_LIST, CHAIN_APPROX_NONE);
+  switch(aShape)
+  {
+    case SHAPES::SQUARE:
+    {
+      for(int i = 0; i < mCurrentContours.size(); i++)
+      {
+        double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+        if(mApproxImage.size().height == 4)
+        {
+          drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0,255,0), 3);
+        }
+      }
+      break;
+    }
+    case SHAPES::RECTANGLE:
+    {
+      for(int i = 0; i < mCurrentContours.size(); i++)
+      {
+        double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+        if(mApproxImage.size().height == 4)
+        {
+          drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0,255,0), 3);
+        }
+      }
+      break;
+    }
+    case SHAPES::TRIANGLE:
+    {
+      for(int i = 0; i < mCurrentContours.size(); i++)
+      {
+        double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+        if(mApproxImage.size().height == 3)
+        {
+          drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0,255,0), 3);
+        }
+      }
+      break;
+    }
+    case SHAPES::UNKNOWNSHAPE:
+    {
+      std::cout << "ERROR - Unknown shape" << std::endl;
+      break;
+    }
+  }
+  return mCurrentContours;
 }

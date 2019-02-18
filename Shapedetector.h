@@ -139,7 +139,7 @@ class Shapedetector
 
   private:
     Mat detectColor(COLORS aShape);
-    int detectShape(SHAPES aShape);
+    std::vector<Mat> detectShape(SHAPES aShape);
 
     COLORS mCurrentColor;
     SHAPES mCurrentShape;
@@ -148,8 +148,12 @@ class Shapedetector
     Mat mOriginalImage;
     Mat mHSVImage;
     Mat mGreyImage;
+    Mat mTresholdImage;
     Mat mMaskImage;
+    Mat mApproxImage;
 
+    Moments mCurrentMoments;
+    std::vector<Mat> mCurrentContours;
     Mat mCurrentMask;
     
     //Color limits (Min / Max)
