@@ -1,7 +1,15 @@
+// Local
+#include "Camera.h"
 
-const uint8_t ESC_KEY = 27;
+Camera::Camera()
+{
+}
 
-Camera::init()
+Camera::~Camera()
+{
+}
+
+void Camera::init()
 {
     if (vidCap.isOpened() == false)
     {
@@ -10,7 +18,7 @@ Camera::init()
     }
 }
 
-Camera::startStream()
+void Camera::startStream()
 {
     while (vidCap.read(currentFrame))
     {

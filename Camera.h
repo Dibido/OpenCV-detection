@@ -1,20 +1,26 @@
-/**
- * @file Camera.h
- * @Thijs
- * @brief Camera class for handling a camera
- * @version 0.1
- * @date 2019-02-18
- */
 #ifndef CAMERA_H_
 #define CAMERA_H_
 
+// Libary
+#include <stdint.h>
+#include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
+
+// Constants
+const uint8_t ESC_KEY = 27;
+
 class Camera
 {
-    public:
+  public:
+    Camera(/* args */);
+    ~Camera();
 
-    private:
-        VideoCapture vidCap(0);
-        Mat currentFrame;
-}
+    void init();
+    void startStream();
+
+  private:
+    VideoCapture vidCap(0);
+    Mat currentFrame;
+};
 
 #endif
