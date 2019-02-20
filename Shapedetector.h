@@ -185,6 +185,8 @@ public:
      */
     void drawShapeContours(Mat aImage, Mat aContour);
 
+    void setShapeFound(Mat aImage);
+
     // Variables
     std::string mImagePath;
 
@@ -235,6 +237,7 @@ public:
     ThresholdTypes mTresholdType;
 
     // Contour settings
+    double mEpsilonMultiply;
     double mMinContourSize;
     double mMaxContourSize;
 

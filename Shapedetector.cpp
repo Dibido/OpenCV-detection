@@ -21,6 +21,8 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   mTresholdType = ThresholdTypes::THRESH_BINARY;
 
   // Set the Contours variables
+  mCurrentShapeCount = 0;
+  mEpsilonMultiply = 0.04;
   mMinContourSize = 500.0;
   mMaxContourSize = 30000.0;
   mTextOffset = 20;
@@ -45,7 +47,6 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   mYellowLimits[1] = Scalar(40, 255, 255);
   mWhiteLimits[0] = Scalar(10, 40, 30); // Is woodcolor instead of white
   mWhiteLimits[1] = Scalar(20, 255, 255);
-  // TODO: find the other limits
 }
 
 Shapedetector::~Shapedetector()
@@ -78,6 +79,7 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
   mClockEnd = std::clock();
   // Put timer value in image
   setTimeValue(mDisplayImage, mClockStart, mClockEnd);
+  setShapeFound(mDisplayImage);
 
   //Show results
   imshow("result", mDisplayImage);
@@ -164,7 +166,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   {
     for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       mCurrentShapeCount++;
       drawShapeContours(mDisplayImage, mCurrentContours.at(i));
@@ -176,13 +178,20 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   {
     for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == 4)
       {
-        mCurrentShapeCount++;
-        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-        setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        if(contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
+        {
+          //Ignore small or huge shapes
+        }
+        else
+        {
+          mCurrentShapeCount++;
+          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        }
       }
     }
     break;
@@ -191,12 +200,20 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   {
     for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == 4)
       {
-        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-        setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        if(contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
+        {
+          //Ignore small or huge shapes
+        }
+        else
+        {
+          mCurrentShapeCount++;
+          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        }
       }
     }
     break;
@@ -205,18 +222,44 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   {
     for (int i = 0; i < mCurrentContours.size(); i++)
     {
-      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == 3)
       {
-        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-        setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        if(contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
+        {
+          //Ignore small or huge shapes
+        }
+        else
+        {
+          mCurrentShapeCount++;
+          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        }
       }
     }
     break;
   }
   case SHAPES::CIRCLE:
   {
+    for (int i = 0; i < mCurrentContours.size(); i++)
+    {
+      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
+      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+      if (mApproxImage.size().height > 5)
+      {
+        if(contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
+        {
+          //Ignore small or huge shapes
+        }
+        else
+        {
+          mCurrentShapeCount++;
+          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        }
+      }
+    }
     break;
   }
   case SHAPES::HALFCIRCLE:
@@ -234,35 +277,21 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
 
 void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)
 {
-  if(contourArea(aContour) < mMinContourSize || contourArea(aContour) > mMaxContourSize)
-  {
-    //Ignore small or huge shapes
-  }
-  else
-  {
   drawContours(aImage, aContour, -1, Scalar(0, 255, 0), 3);
-  }
 }
 
 void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
 {
   Moments currentmoments;
-  if( contourArea(aContour) < mMinContourSize || contourArea(aContour) > mMaxContourSize)
-  {
-    //Ignore small or huge shapes
-  }
-  else
-  {
-      currentmoments = moments(aContour);
-      int cX = (int)(currentmoments.m10 / currentmoments.m00);
-      int cY = (int)(currentmoments.m01 / currentmoments.m00);
-      const std::string xPosString = std::string("X:" + std::to_string(cX));
-      const std::string yPosString = std::string("Y:" + std::to_string(cY));
-      const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
-      putText(aImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-      putText(aImage, yPosString, Point(cX, cY + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-      putText(aImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255 , 255, 255), 1);
-  }
+  currentmoments = moments(aContour);
+  int cX = (int)(currentmoments.m10 / currentmoments.m00);
+  int cY = (int)(currentmoments.m01 / currentmoments.m00);
+  const std::string xPosString = std::string("X:" + std::to_string(cX));
+  const std::string yPosString = std::string("Y:" + std::to_string(cY));
+  const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
+  putText(aImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+  putText(aImage, yPosString, Point(cX, cY + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+  putText(aImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255 , 255, 255), 1);
 }
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
@@ -270,5 +299,12 @@ void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock
   std::cout << std::fixed << std::setprecision(2) << "CPU time used: " << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms\n" << std::endl;
   double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
   const std::string timeText = std::string("T:" + std::to_string(calcTime) + "ms");
-  putText(aImage, timeText, Point(0 + mTimeXOffset, 0 + mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0 ,255, 0), 1);
+  putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0 ,255, 0), 1);
+}
+
+void Shapedetector::setShapeFound(Mat aImage)
+{
+  const std::string shapeCountText = ShapeToString(mCurrentShape) + " count :" + std::to_string(mCurrentShapeCount);
+  std::cout << shapeCountText << std::endl;
+  putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 255, 0), 1);
 }
