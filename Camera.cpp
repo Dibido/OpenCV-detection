@@ -9,25 +9,18 @@ Camera::~Camera()
 {
 }
 
-void Camera::init()
+void Camera::read()
 {
     if (vidCap.isOpened() == false)
     {
-        std::cout << "Video capture not opened" << std::endl;
-        return -1;
+        std::cout << "Error: video capture not opened" << std::endl;
     }
+    vidCap.read(currentFrame);
 }
 
-void Camera::startStream()
+void Camera::display()
 {
-    while (vidCap.read(currentFrame))
-    {
-        namedWindow("CameraStream");
-        imshow("CameraStream", currentFrame);
-        moveWindow("CameraStream", 1000, 500);
-
-        int pressedKey = waitKey(30);
-        if (pressedKey == ESC_KEY)
-            break;
-    }
+    namedWindow("Camera");
+    imshow("Camera", currentFrame);
+    moveWindow("Camera", 1000, 500);
 }

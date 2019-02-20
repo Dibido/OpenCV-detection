@@ -6,20 +6,20 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/videoio.hpp>
 
-// Constants
-const uint8_t ESC_KEY = 27;
+// Namespace
+using namespace cv;
 
 class Camera
 {
   public:
-    Camera(/* args */);
+    Camera();
     ~Camera();
 
-    void init();
-    void startStream();
+    void read();
+    void display();
 
   private:
-    VideoCapture vidCap(0);
+    VideoCapture vidCap;
     Mat currentFrame;
 };
 
