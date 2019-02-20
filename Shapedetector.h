@@ -1,10 +1,3 @@
-/**
- * @file shapedetector.h
- * @dibran
- * @brief shapedetector class for detecting shapes.
- * @version 0.1
- * @date 2019-02-17
- */
 #ifndef SHAPE_DETECTOR_H_
 #define SHAPE_DETECTOR_H_
 
@@ -25,89 +18,86 @@
 // Namespace
 using namespace cv;
 
-/**
- * @brief Enum for the different possible shapes
- */
+// Enums
 enum SHAPES
 {
-  ALL,
-  CIRCLE,
-  HALFCIRCLE,
-  SQUARE,
-  RECTANGLE,
-  TRIANGLE,
-  UNKNOWNSHAPE
+    ALL,
+    CIRCLE,
+    HALFCIRCLE,
+    SQUARE,
+    RECTANGLE,
+    TRIANGLE,
+    UNKNOWNSHAPE
 };
-
-static const std::vector<std::string> SHAPESTRINGS =
-{
-  "alles",
-  "cirkel",
-  "halfcirkel",
-  "vierkant",
-  "rechthoek",
-  "driehoek",
-  "onbekend"
-};
-
-inline std::string ShapeToString(SHAPES aShape)
-{
-  return SHAPESTRINGS[aShape];
-}
-
-inline SHAPES StringToShape(std::string aShapeString)
-{
-  for (size_t i = 0; i < SHAPESTRINGS.size(); i++)
-  {
-    if (aShapeString == SHAPESTRINGS[i])
-    {
-      return SHAPES(i);
-    }
-  }
-  return SHAPES::UNKNOWNSHAPE;
-}
-
-/**
- * @brief Enum for the different possible colors
- */
 enum COLORS
 {
-  RED,
-  GREEN,
-  BLUE,
-  BLACK,
-  YELLOW,
-  WHITE,
-  UNKNOWNCOLOR
+    RED,
+    GREEN,
+    BLUE,
+    BLACK,
+    YELLOW,
+    WHITE,
+    UNKNOWNCOLOR
 };
 
+// Strings
+static const std::vector<std::string> SHAPESTRINGS =
+    {
+        "alles",
+        "cirkel",
+        "halfcirkel",
+        "vierkant",
+        "rechthoek",
+        "driehoek",
+        "onbekend"};
 static const std::vector<std::string> COLORSTRINGS =
-{
-  "rood",
-  "groen",
-  "blauw",
-  "zwart",
-  "geel",
-  "wit",
-  "onbekend"
-};
+    {
+        "rood",
+        "groen",
+        "blauw",
+        "zwart",
+        "geel",
+        "wit",
+        "onbekend"};
 
+// Shape converters
+inline std::string ShapeToString(SHAPES aShape)
+{
+    return SHAPESTRINGS[aShape];
+}
+inline SHAPES StringToShape(std::string aShapeString)
+{
+    SHAPES result = UNKNOWNSHAPE;
+
+    for (size_t i = 0; i < SHAPESTRINGS.size(); i++)
+    {
+        if (aShapeString == SHAPESTRINGS[i])
+        {
+            result = SHAPES(i);
+        }
+    }
+    return result;
+}
+
+// Color converters
 inline std::string ColorToString(COLORS aColor)
 {
-  return COLORSTRINGS[aColor];
+    return COLORSTRINGS[aColor];
 }
-
 inline COLORS StringToColor(std::string aColorString)
 {
-  for (size_t i = 0; i < COLORSTRINGS.size(); i++)
-  {
-    if (aColorString == COLORSTRINGS[i])
+    COLORS result = COLORS::UNKNOWNCOLOR;
+
+    for (size_t i = 0; i < COLORSTRINGS.size(); i++)
     {
-      return COLORS(i);
+        if (aColorString == COLORSTRINGS[i])
+        {
+            result = COLORS(i);
+        }
     }
-  }
-  return COLORS::UNKNOWNCOLOR;
+    return result;
 }
+
 /**
  * @brief Convert an HSV scalar to BGR
  * 
@@ -118,10 +108,10 @@ inline COLORS StringToColor(std::string aColorString)
  */
 inline Scalar ScalarHSV2BGR(uchar H, uchar S, uchar V)
 {
-  Mat rgb;
-  Mat hsv(1, 1, CV_8UC3, Scalar(H, S, V));
-  cvtColor(hsv, rgb, CV_HSV2BGR);
-  return Scalar(rgb.data[0], rgb.data[1], rgb.data[2]);
+    Mat rgb;
+    Mat hsv(1, 1, CV_8UC3, Scalar(H, S, V));
+    cvtColor(hsv, rgb, CV_HSV2BGR);
+    return Scalar(rgb.data[0], rgb.data[1], rgb.data[2]);
 }
 
 /**
@@ -133,23 +123,37 @@ inline Scalar ScalarHSV2BGR(uchar H, uchar S, uchar V)
  */
 inline bool fileExists(const std::string &aFilePath)
 {
-  std::ifstream f(aFilePath.c_str());
-  return f.good();
+    std::ifstream f(aFilePath.c_str());
+    return f.good();
 }
 
+/**
+ * @brief Shapedetector class
+ */
 class Shapedetector
 {
-public:
-  Shapedetector(std::string aImageFilePath);
-  ~Shapedetector();
+  public:
+    Shapedetector(std::string aImageFilePath);
+    ~Shapedetector();
 
     /**
      * @brief Handles a single shape command
      * @param aShapeCommand 
      */
-    void handleShapeCommand(const std::string& aShapeCommand);
+    void handleShapeCommand(const std::string &aShapeCommand);
+
+    // Image matrices
+    Mat mOriginalImage;
+    Mat mDisplayImage;
+    Mat mMaskImage;
 
   private:
+    // Private image matrices
+    Mat mHSVImage;
+    Mat mGreyImage;
+    Mat mTresholdImage;
+    Mat mApproxImage;
+
     // Functions
     /**
      * @brief Detect a color in an image
@@ -196,15 +200,6 @@ public:
     // Variables
     std::string mImagePath;
 
-    // Image matrices
-    Mat mOriginalImage;
-    Mat mDisplayImage;
-    Mat mHSVImage;
-    Mat mGreyImage;
-    Mat mTresholdImage;
-    Mat mMaskImage;
-    Mat mApproxImage;
-
     // Current command values
     COLORS mCurrentColor;
     SHAPES mCurrentShape;
@@ -223,7 +218,7 @@ public:
     // Timer variables
     std::clock_t mClockStart;
     std::clock_t mClockEnd;
-    
+
     // Time position
     int mTimeXOffset;
     int mTimeYOffset;

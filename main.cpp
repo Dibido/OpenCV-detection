@@ -17,43 +17,51 @@ std::shared_ptr<Shapedetector> detector;
 
 void interactiveMode(std::string imgPath)
 {
-    detector = std::make_shared<Shapedetector>(imgPath); // start shapedetector
+    Shapedetector shapeDetector(imgPath);
 
-    std::cout << "Entered interactive mode" << std::endl
-              << "> ";
-    std::string aCommand;
-    while (aCommand != EXIT_COMMAND)
+    std::cout << "Entered interactive mode" << std::endl;
+    std::cout << "Please enter [kleur] [vorm]" << std::endl;
+    std::cout << "> ";
+
+    while (true)
     {
-        getline(std::cin, aCommand);
-        detector->handleShapeCommand(aCommand);
-        std::cout << "> ";
+        std::string command;
+        getline(std::cin, command); // Get command
+
+        if (command == EXIT_COMMAND)
+        {
+            return;
+        }
+        else
+        {
+            shapeDetector.handleShapeCommand(command); // Start algorithm
+
+            imshow("result", shapeDetector.mDisplayImage);
+            moveWindow("result", 0, 0);
+            
+            imshow("mask", shapeDetector.mMaskImage);
+            moveWindow("mask", shapeDetector.mOriginalImage.cols, 0);
+        }
     }
+
+    // int r = 50;
+    // int range = 100;
+    // createTrackbar("R", "mask", &r, range);
+
+    // int pressedKey = waitKey(0);
+    // if (pressedKey = ESC_KEY) { /* do something */ }
+
+    /*
+	Program flow:
+	1. set color (black, white, red, green, blue, yellow)
+	2. set shape (circle, halfCircle, square, rectangle, triangle)
+	*/
 }
 
 void batchMode()
 {
+    // TODO implement
 }
-
-int start()
-{
-    // interactive
-    // batch
-    // error
-
-    
-}
-
-/// Error codes to be returned by functions
-enum ErrorCode
-{
-    ERROR,
-    INVALID_FILE_PATH
-
-    //     std::cout << "ERROR - Image File does not exist." << std::endl;
-    //     std::cout << "ERROR - Batchfile does not exist." << std::endl;
-    // std::cout << "Invalid arguments. \n\""
-};
-
 
 int main(int argc, char **argv)
 {
@@ -76,7 +84,6 @@ int main(int argc, char **argv)
         std::cout << "Started in batchmode" << std::endl;
         if (fileExists(argv[2]))
         {
-            //TODO: process batch file
             batchMode();
         }
         else
