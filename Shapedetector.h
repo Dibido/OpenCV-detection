@@ -46,7 +46,8 @@ static const std::vector<std::string> SHAPESTRINGS =
   "halfcirkel",
   "vierkant",
   "rechthoek",
-  "driehoek"
+  "driehoek",
+  "onbekend"
 };
 
 inline std::string ShapeToString(SHAPES aShape)
@@ -87,7 +88,8 @@ static const std::vector<std::string> COLORSTRINGS =
   "blauw",
   "zwart",
   "geel",
-  "wit"
+  "wit",
+  "onbekend"
 };
 
 inline std::string ColorToString(COLORS aColor)
@@ -185,6 +187,10 @@ public:
      */
     void drawShapeContours(Mat aImage, Mat aContour);
 
+    /**
+     * @brief Set the count of shapes found
+     * @param aImage the image to set the count on
+     */
     void setShapeFound(Mat aImage);
 
     // Variables
@@ -237,6 +243,7 @@ public:
     ThresholdTypes mTresholdType;
 
     // Contour settings
+    int mContourCenterMargin;
     double mEpsilonMultiply;
     double mMinContourSize;
     double mMaxContourSize;
