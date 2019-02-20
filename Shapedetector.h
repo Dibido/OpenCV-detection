@@ -38,7 +38,7 @@ enum SHAPES
   UNKNOWNSHAPE
 };
 
-static const std::vector<std::string> SHAPESTRINGS = 
+static const std::vector<std::string> SHAPESTRINGS =
 {
   "cirkel",
   "halfcirkel",
@@ -54,9 +54,9 @@ inline std::string ShapeToString(SHAPES aShape)
 
 inline SHAPES StringToShape(std::string aShapeString)
 {
-  for(size_t i = 0; i < SHAPESTRINGS.size(); i++)
+  for (size_t i = 0; i < SHAPESTRINGS.size(); i++)
   {
-    if(aShapeString == SHAPESTRINGS[i])
+    if (aShapeString == SHAPESTRINGS[i])
     {
       return SHAPES(i);
     }
@@ -78,7 +78,7 @@ enum COLORS
   UNKNOWNCOLOR
 };
 
-static const std::vector<std::string> COLORSTRINGS = 
+static const std::vector<std::string> COLORSTRINGS =
 {
   "rood",
   "groen",
@@ -95,9 +95,9 @@ inline std::string ColorToString(COLORS aColor)
 
 inline COLORS StringToColor(std::string aColorString)
 {
-  for(size_t i = 0; i < COLORSTRINGS.size(); i++)
+  for (size_t i = 0; i < COLORSTRINGS.size(); i++)
   {
-    if(aColorString == COLORSTRINGS[i])
+    if (aColorString == COLORSTRINGS[i])
     {
       return COLORS(i);
     }
@@ -112,11 +112,12 @@ inline COLORS StringToColor(std::string aColorString)
  * @param V Value value
  * @return Scalar BGR Scalar
  */
-inline Scalar ScalarHSV2BGR(uchar H, uchar S, uchar V) {
-    Mat rgb;
-    Mat hsv(1,1, CV_8UC3, Scalar(H,S,V));
-    cvtColor(hsv, rgb, CV_HSV2BGR);
-    return Scalar(rgb.data[0], rgb.data[1], rgb.data[2]);
+inline Scalar ScalarHSV2BGR(uchar H, uchar S, uchar V)
+{
+  Mat rgb;
+  Mat hsv(1, 1, CV_8UC3, Scalar(H, S, V));
+  cvtColor(hsv, rgb, CV_HSV2BGR);
+  return Scalar(rgb.data[0], rgb.data[1], rgb.data[2]);
 }
 
 /**
@@ -126,18 +127,19 @@ inline Scalar ScalarHSV2BGR(uchar H, uchar S, uchar V) {
  * @return true file exists
  * @return false file does not exist
  */
-inline bool fileExists (const std::string& aFilePath) {
+inline bool fileExists(const std::string &aFilePath)
+{
   std::ifstream f(aFilePath.c_str());
   return f.good();
 }
 
 class Shapedetector
 {
-  public:
-    Shapedetector(std::string aImageFilePath);
-    ~Shapedetector();
+public:
+  Shapedetector(std::string aImageFilePath);
+  ~Shapedetector();
 
-    /**
+  /**
      * @brief Handles a single shape command
      * @param aShapeCommand 
      */

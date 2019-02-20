@@ -75,55 +75,70 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 
   //Show results
   imshow("original", mOriginalImage);
+  moveWindow("original", 0, 0);
   imshow("mask", mMaskImage);
-  waitKey(0);
+  moveWindow("mask", mOriginalImage.cols, 0);
+
+	int r = 50;
+	int range = 100;
+	createTrackbar("R", "mask", &r, range);
+
+	int pressedKey = waitKey(0);
+	// if (pressedKey = ESC_KEY) { /* do something */ }
+
+	/*
+	PSEUDO CODE:
+
+	set color: red, green, blue, yellow, black, white
+	set shape: circle, halfCircle, square, rect, triangle
+	*/
 }
 
 Mat Shapedetector::detectColor(COLORS aColor)
 {
-  Mat resultMask;
-  Mat tempMask;
-  Mat resultImage;
-  switch (aColor)
-  {
-  case COLORS::BLUE:
-  {
-    inRange(mHSVImage, mBlueLimits[0], mBlueLimits[1], resultMask);
-    break;
-  }
-  case COLORS::GREEN:
-  {
-    inRange(mHSVImage, mGreenLimits[0], mGreenLimits[1], resultMask);
-    break;
-  }
-  case COLORS::RED:
-  {
-    inRange(mHSVImage, mRedLimits[0], mRedLimits[1], resultMask);
-    inRange(mHSVImage, mRedLimits[2], mRedLimits[3], tempMask);
-    bitwise_or(resultMask, tempMask, resultMask);
-    break;
-  }
-  case COLORS::BLACK:
-  {
-    break;
-  }
-  case COLORS::YELLOW:
-  {
-    break;
-  }
-  case COLORS::WHITE:
-  {
-    break;
-  }
-  case COLORS::UNKNOWNCOLOR:
-  {
-    std::cout << "ERROR - Unknown color" << std::endl;
-    break;
-  }
-  }
-  resultMask.copyTo(mCurrentMask);
-  mOriginalImage.copyTo(resultImage, resultMask);
-  return resultImage;
+	Mat resultMask;
+	Mat tempMask;
+	Mat resultImage;
+	switch (aColor)
+	{
+	case COLORS::BLUE:
+	{
+		inRange(mHSVImage, mBlueLimits[0], mBlueLimits[1], resultMask);
+		break;
+	}
+	case COLORS::GREEN:
+	{
+		inRange(mHSVImage, mGreenLimits[0], mGreenLimits[1], resultMask);
+		break;
+	}
+	case COLORS::RED:
+	{
+		inRange(mHSVImage, mRedLimits[0], mRedLimits[1], resultMask);
+		inRange(mHSVImage, mRedLimits[2], mRedLimits[3], tempMask);
+		bitwise_or(resultMask, tempMask, resultMask);
+		break;
+	}
+	case COLORS::BLACK:
+	{
+		break;
+	}
+	case COLORS::YELLOW:
+	{
+		break;
+	}
+	case COLORS::WHITE:
+	{
+		break;
+	}
+	case COLORS::UNKNOWNCOLOR:
+	{
+		std::cout << "ERROR - Unknown color" << std::endl;
+		break;
+	}
+	}
+	resultMask.copyTo(mCurrentMask);
+	mOriginalImage.copyTo(resultImage, resultMask);
+	return resultImage;
 }
 
 std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
@@ -209,7 +224,7 @@ void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)
 void Shapedetector::setShapeValues(Mat aContour)
 {
   Moments currentmoments;
-  if(contourArea(aContour) < mMinContourSize || contourArea(aContour) > mMaxContourSize)
+  if( contourArea(aContour) < mMinContourSize || contourArea(aContour) > mMaxContourSize)
   {
     //Ignore small shapes
   }
@@ -223,7 +238,7 @@ void Shapedetector::setShapeValues(Mat aContour)
       const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
       putText(mOriginalImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
       putText(mOriginalImage, yPosString, Point(cX, cY + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-      putText(mOriginalImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255,255,255), 1);
+      putText(mOriginalImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255 , 255, 255), 1);
   }
 }
 
