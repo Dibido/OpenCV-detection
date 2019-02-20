@@ -10,9 +10,12 @@
 
 // Library
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <string>
 #include <vector>
+#include <chrono>
+#include <ctime>
 #include <opencv2/opencv.hpp>
 
 // Local
@@ -145,6 +148,8 @@ class Shapedetector
     Mat detectColor(COLORS aShape);
     std::vector<Mat> detectShape(SHAPES aShape);
     void setShapeValues(Mat aContour);
+    void setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime);
+    void drawShapeContours(Mat aImage, Mat aContour);
 
     // Variables
     std::string mImagePath;
@@ -162,6 +167,19 @@ class Shapedetector
     Moments mCurrentMoments;
     std::vector<Mat> mCurrentContours;
     Mat mCurrentMask;
+
+    int mCurrentShapeCount;
+
+    // Blur variables
+    Size mGaussianKernelsize;
+
+    // Timer variables
+    std::clock_t mClockStart;
+    std::clock_t mClockEnd;
+    // Time position
+    int mTimeXOffset;
+    int mTimeYOffset;
+
     // Calibration variables
     // Color limits (Min / Max)
     Scalar mBlueLimits[2];
@@ -177,7 +195,8 @@ class Shapedetector
     ThresholdTypes mTresholdType;
 
     // Contour settings
-    int mMinContourSize;
+    double mMinContourSize;
+    double mMaxContourSize;
     int mTextOffset;
     double mTextSize;
 };
