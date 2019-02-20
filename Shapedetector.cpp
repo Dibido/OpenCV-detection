@@ -10,6 +10,18 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
   cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
 
+  // Set the blur variables
+
+  // Set the treshold variables
+  mMinTreshold = 120;
+  mMaxTreshold = 255;
+  mTresholdType = ThresholdTypes::THRESH_BINARY;
+
+  // Set the Contours variables
+  mMinContourSize = 40;
+  mTextOffset = 20;
+  mTextSize = 0.5;
+
   // Set the color limits for color detection [0] = Min, [1] = Max
   mBlueLimits[0] = Scalar(85, 40, 30);
   mBlueLimits[1] = Scalar(135, 255, 255);
@@ -19,8 +31,8 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   mRedLimits[1] = Scalar(10, 255, 255);
   mRedLimits[2] = Scalar(170, 60, 60);
   mRedLimits[3] = Scalar(180, 255, 255);
-  mBlackLimits[0] = Scalar();
-  mBlackLimits[1] = Scalar();
+  mBlackLimits[0] = Scalar(0, 0, 0);
+  mBlackLimits[1] = Scalar(255, 100, 100);
   mYellowLimits[0] = Scalar();
   mYellowLimits[1] = Scalar();
   mWhiteLimits[0] = Scalar(); // Is woodcolor instead of white
@@ -101,8 +113,16 @@ Mat Shapedetector::detectColor(COLORS aColor)
 
 std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
 {
-  threshold(mGreyImage, mTresholdImage, 0, 255, 0);
+  // threshold(mGreyImage, mTresholdImage, mMinTreshold, mMaxTreshold, mTresholdType);
+  GaussianBlur(mGreyImage, mGreyImage, Size(5,5), BorderTypes::BORDER_REFLECT101);
+  adaptiveThreshold(mGreyImage, mTresholdImage, 255, AdaptiveThresholdTypes::ADAPTIVE_THRESH_GAUSSIAN_C, mTresholdType, 21, 9);
   findContours(mTresholdImage, mCurrentContours, CV_RETR_LIST, CHAIN_APPROX_NONE);
+  // for (int i = 0; i < mCurrentContours.size(); i++)
+  //   {
+  //     double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+  //     approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+  //       drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
+  //   }
   switch (aShape)
   {
   case SHAPES::SQUARE:
@@ -114,6 +134,8 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
       if (mApproxImage.size().height == 4)
       {
         drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
+        setShapeValues(mCurrentContours.at(i));
+                
       }
     }
     break;
@@ -127,6 +149,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
       if (mApproxImage.size().height == 4)
       {
         drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
+        setShapeValues(mCurrentContours.at(i));
       }
     }
     break;
@@ -140,9 +163,18 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
       if (mApproxImage.size().height == 3)
       {
         drawContours(mOriginalImage, mCurrentContours.at(i), -1, Scalar(0, 255, 0), 3);
+        setShapeValues(mCurrentContours.at(i));
       }
     }
     break;
+  }
+  case SHAPES::CIRCLE:
+  {
+    break;
+  }
+  case SHAPES::HALFCIRCLE:
+  {
+
   }
   case SHAPES::UNKNOWNSHAPE:
   {
@@ -151,4 +183,25 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   }
   }
   return mCurrentContours;
+}
+
+void Shapedetector::setShapeValues(Mat aContour)
+{
+  Moments currentmoments;
+  if(contourArea(aContour) < mMinContourSize)
+  {
+    //Ignore small shapes
+  }
+  else
+  {
+      currentmoments = moments(aContour);
+      int cX = (int)(currentmoments.m10 / currentmoments.m00);
+      int cY = (int)(currentmoments.m01 / currentmoments.m00);
+      const std::string xPosString = std::string("X:" + std::to_string(cX));
+      const std::string yPosString = std::string("Y:" + std::to_string(cY));
+      const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
+      putText(mOriginalImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+      putText(mOriginalImage, yPosString, Point(cX, cY - mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+      putText(mOriginalImage, areaString, Point(cX, cY - (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255,255,255), 1);
+  }
 }

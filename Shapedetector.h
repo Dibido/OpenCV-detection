@@ -141,11 +141,12 @@ class Shapedetector
     void handleShapeCommand(const std::string& aShapeCommand);
 
   private:
+    // Functions
     Mat detectColor(COLORS aShape);
     std::vector<Mat> detectShape(SHAPES aShape);
+    void setShapeValues(Mat aContour);
 
-    COLORS mCurrentColor;
-    SHAPES mCurrentShape;
+    // Variables
     std::string mImagePath;
 
     Mat mOriginalImage;
@@ -155,17 +156,30 @@ class Shapedetector
     Mat mMaskImage;
     Mat mApproxImage;
 
+    COLORS mCurrentColor;
+    SHAPES mCurrentShape;
+
     Moments mCurrentMoments;
     std::vector<Mat> mCurrentContours;
     Mat mCurrentMask;
-    
-    //Color limits (Min / Max)
+    // Calibration variables
+    // Color limits (Min / Max)
     Scalar mBlueLimits[2];
     Scalar mGreenLimits[2];
     Scalar mRedLimits[4]; // 4 values for 0-10 and 170-180
     Scalar mBlackLimits[2];
     Scalar mYellowLimits[2];
     Scalar mWhiteLimits[2];
+
+    // Treshold values
+    int mMinTreshold;
+    int mMaxTreshold;
+    ThresholdTypes mTresholdType;
+
+    // Contour settings
+    int mMinContourSize;
+    int mTextOffset;
+    double mTextSize;
 };
 
 #endif
