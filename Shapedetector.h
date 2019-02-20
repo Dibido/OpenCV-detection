@@ -30,6 +30,7 @@ using namespace cv;
  */
 enum SHAPES
 {
+  ALL,
   CIRCLE,
   HALFCIRCLE,
   SQUARE,
@@ -40,6 +41,7 @@ enum SHAPES
 
 static const std::vector<std::string> SHAPESTRINGS =
 {
+  "alles",
   "cirkel",
   "halfcirkel",
   "vierkant",
@@ -139,7 +141,7 @@ public:
   Shapedetector(std::string aImageFilePath);
   ~Shapedetector();
 
-  /**
+    /**
      * @brief Handles a single shape command
      * @param aShapeCommand 
      */
@@ -147,29 +149,64 @@ public:
 
   private:
     // Functions
-    Mat detectColor(COLORS aShape);
+    /**
+     * @brief Detect a color in an image
+     * @param aColor the color to detect
+     * @return Mat a Mask with the current color filter
+     */
+    Mat detectColor(COLORS aColor);
+
+    /**
+     * @brief Detect a shape in an image
+     * @param aShape the shape to detect
+     * @return std::vector<Mat> The contours of the found shapes
+     */
     std::vector<Mat> detectShape(SHAPES aShape);
-    void setShapeValues(Mat aContour);
+
+    /**
+     * @brief Set the X/Y/Area in the center of the shape
+     * @param aImage The image to set the values on
+     * @param aContour The contour to place the values in
+     */
+    void setShapeValues(Mat aImage, Mat aContour);
+
+    /**
+     * @brief Set the Time in the image
+     * @param aImage The image to set the time in
+     * @param aStartTime The start time
+     * @param aEndTime The end time
+     */
     void setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime);
+
+    /**
+     * @brief Draws the contours of a shape
+     * @param aImage The image to draw on
+     * @param aContour The contours to draw
+     */
     void drawShapeContours(Mat aImage, Mat aContour);
 
     // Variables
     std::string mImagePath;
 
+    // Image matrices
     Mat mOriginalImage;
+    Mat mDisplayImage;
     Mat mHSVImage;
     Mat mGreyImage;
     Mat mTresholdImage;
     Mat mMaskImage;
     Mat mApproxImage;
 
+    // Current command values
     COLORS mCurrentColor;
     SHAPES mCurrentShape;
 
-    Moments mCurrentMoments;
-    std::vector<Mat> mCurrentContours;
+    // Calculation values
     Mat mCurrentMask;
+    std::vector<Mat> mCurrentContours;
+    Moments mCurrentMoments;
 
+    // Shapecounter
     int mCurrentShapeCount;
 
     // Blur variables
@@ -178,6 +215,7 @@ public:
     // Timer variables
     std::clock_t mClockStart;
     std::clock_t mClockEnd;
+    
     // Time position
     int mTimeXOffset;
     int mTimeYOffset;
@@ -199,6 +237,8 @@ public:
     // Contour settings
     double mMinContourSize;
     double mMaxContourSize;
+
+    // Text variables
     int mTextOffset;
     double mTextSize;
 };

@@ -5,7 +5,9 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
 {
   // Store origininal image
   mOriginalImage = imread(mImagePath);
+  mOriginalImage.copyTo(mDisplayImage);
   mOriginalImage.copyTo(mTresholdImage);
+  
   // Convert to necessary formats
   cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
   cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
@@ -19,8 +21,8 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   mTresholdType = ThresholdTypes::THRESH_BINARY;
 
   // Set the Contours variables
-  mMinContourSize = 600.0;
-  mMaxContourSize = 8000.0;
+  mMinContourSize = 500.0;
+  mMaxContourSize = 30000.0;
   mTextOffset = 20;
   mTextSize = 0.5;
 
@@ -31,18 +33,18 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   // Set the color limits for color detection [0] = Min, [1] = Max
   mBlueLimits[0] = Scalar(85, 40, 30);
   mBlueLimits[1] = Scalar(135, 255, 255);
-  mGreenLimits[0] = Scalar(40, 40, 40);
-  mGreenLimits[1] = Scalar(75, 255, 255);
+  mGreenLimits[0] = Scalar(40, 25, 25);
+  mGreenLimits[1] = Scalar(80, 255, 255);
   mRedLimits[0] = Scalar(0, 60, 60);
   mRedLimits[1] = Scalar(10, 255, 255);
   mRedLimits[2] = Scalar(170, 60, 60);
   mRedLimits[3] = Scalar(180, 255, 255);
   mBlackLimits[0] = Scalar(0, 0, 0);
   mBlackLimits[1] = Scalar(255, 100, 100);
-  mYellowLimits[0] = Scalar();
-  mYellowLimits[1] = Scalar();
-  mWhiteLimits[0] = Scalar(); // Is woodcolor instead of white
-  mWhiteLimits[1] = Scalar();
+  mYellowLimits[0] = Scalar(20, 40, 30);
+  mYellowLimits[1] = Scalar(40, 255, 255);
+  mWhiteLimits[0] = Scalar(10, 40, 30); // Is woodcolor instead of white
+  mWhiteLimits[1] = Scalar(20, 255, 255);
   // TODO: find the other limits
 }
 
@@ -62,6 +64,10 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
   mCurrentColor = StringToColor(commandColor);
   mCurrentShape = StringToShape(commandShape);
 
+  //Reset values
+  mOriginalImage.copyTo(mDisplayImage);
+  mOriginalImage.copyTo(mTresholdImage);
+
   // Start timer
   mClockStart = std::clock();
 
@@ -71,19 +77,21 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
   // Stop timer
   mClockEnd = std::clock();
   // Put timer value in image
-  setTimeValue(mOriginalImage, mClockStart, mClockEnd);
+  setTimeValue(mDisplayImage, mClockStart, mClockEnd);
 
   //Show results
-  imshow("original", mOriginalImage);
-  moveWindow("original", 0, 0);
+  imshow("result", mDisplayImage);
+  moveWindow("result", 0, 0);
   imshow("mask", mMaskImage);
   moveWindow("mask", mOriginalImage.cols, 0);
 
-	int r = 50;
-	int range = 100;
-	createTrackbar("R", "mask", &r, range);
+  waitKey(0);
 
-	int pressedKey = waitKey(0);
+	// int r = 50;
+	// int range = 100;
+	// createTrackbar("R", "mask", &r, range);
+
+	// int pressedKey = waitKey(0);
 	// if (pressedKey = ESC_KEY) { /* do something */ }
 
 	/*
@@ -101,40 +109,43 @@ Mat Shapedetector::detectColor(COLORS aColor)
 	Mat resultImage;
 	switch (aColor)
 	{
-	case COLORS::BLUE:
-	{
-		inRange(mHSVImage, mBlueLimits[0], mBlueLimits[1], resultMask);
-		break;
-	}
-	case COLORS::GREEN:
-	{
-		inRange(mHSVImage, mGreenLimits[0], mGreenLimits[1], resultMask);
-		break;
-	}
-	case COLORS::RED:
-	{
-		inRange(mHSVImage, mRedLimits[0], mRedLimits[1], resultMask);
-		inRange(mHSVImage, mRedLimits[2], mRedLimits[3], tempMask);
-		bitwise_or(resultMask, tempMask, resultMask);
-		break;
-	}
-	case COLORS::BLACK:
-	{
-		break;
-	}
-	case COLORS::YELLOW:
-	{
-		break;
-	}
-	case COLORS::WHITE:
-	{
-		break;
-	}
-	case COLORS::UNKNOWNCOLOR:
-	{
-		std::cout << "ERROR - Unknown color" << std::endl;
-		break;
-	}
+    case COLORS::BLUE:
+    {
+      inRange(mHSVImage, mBlueLimits[0], mBlueLimits[1], resultMask);
+      break;
+    }
+    case COLORS::GREEN:
+    {
+      inRange(mHSVImage, mGreenLimits[0], mGreenLimits[1], resultMask);
+      break;
+    }
+    case COLORS::RED:
+    {
+      inRange(mHSVImage, mRedLimits[0], mRedLimits[1], resultMask);
+      inRange(mHSVImage, mRedLimits[2], mRedLimits[3], tempMask);
+      bitwise_or(resultMask, tempMask, resultMask);
+      break;
+    }
+    case COLORS::BLACK:
+    {
+      inRange(mHSVImage, mBlackLimits[0], mBlackLimits[1], resultMask);
+      break;
+    }
+    case COLORS::YELLOW:
+    {
+      inRange(mHSVImage, mYellowLimits[0], mYellowLimits[1], resultMask);
+      break;
+    }
+    case COLORS::WHITE:
+    {
+      inRange(mHSVImage, mWhiteLimits[0], mWhiteLimits[1], resultMask);
+      break;
+    }
+    case COLORS::UNKNOWNCOLOR:
+    {
+      std::cout << "ERROR - Unknown color" << std::endl;
+      break;
+    }
 	}
 	resultMask.copyTo(mCurrentMask);
 	mOriginalImage.copyTo(resultImage, resultMask);
@@ -149,6 +160,18 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   findContours(mTresholdImage, mCurrentContours, CV_RETR_TREE, CHAIN_APPROX_NONE);
   switch (aShape)
   {
+  case SHAPES::ALL:
+  {
+    for (int i = 0; i < mCurrentContours.size(); i++)
+    {
+      double epsilon = 0.04 * arcLength(mCurrentContours.at(i), true);
+      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+      mCurrentShapeCount++;
+      drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+      setShapeValues(mDisplayImage, mCurrentContours.at(i));
+    }
+    break;
+  }
   case SHAPES::SQUARE:
   {
     for (int i = 0; i < mCurrentContours.size(); i++)
@@ -158,8 +181,8 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
       if (mApproxImage.size().height == 4)
       {
         mCurrentShapeCount++;
-        drawShapeContours(mOriginalImage, mCurrentContours.at(i));
-        setShapeValues(mCurrentContours.at(i));
+        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+        setShapeValues(mDisplayImage, mCurrentContours.at(i));
       }
     }
     break;
@@ -172,8 +195,8 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == 4)
       {
-        drawShapeContours(mOriginalImage, mCurrentContours.at(i));
-        setShapeValues(mCurrentContours.at(i));
+        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+        setShapeValues(mDisplayImage, mCurrentContours.at(i));
       }
     }
     break;
@@ -186,8 +209,8 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == 3)
       {
-        drawShapeContours(mOriginalImage, mCurrentContours.at(i));
-        setShapeValues(mCurrentContours.at(i));
+        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+        setShapeValues(mDisplayImage, mCurrentContours.at(i));
       }
     }
     break;
@@ -213,20 +236,20 @@ void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)
 {
   if(contourArea(aContour) < mMinContourSize || contourArea(aContour) > mMaxContourSize)
   {
-    //Ignore small shapes
+    //Ignore small or huge shapes
   }
   else
   {
-  drawContours(mOriginalImage, aContour, -1, Scalar(0, 255, 0), 3);
+  drawContours(aImage, aContour, -1, Scalar(0, 255, 0), 3);
   }
 }
 
-void Shapedetector::setShapeValues(Mat aContour)
+void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
 {
   Moments currentmoments;
   if( contourArea(aContour) < mMinContourSize || contourArea(aContour) > mMaxContourSize)
   {
-    //Ignore small shapes
+    //Ignore small or huge shapes
   }
   else
   {
@@ -236,9 +259,9 @@ void Shapedetector::setShapeValues(Mat aContour)
       const std::string xPosString = std::string("X:" + std::to_string(cX));
       const std::string yPosString = std::string("Y:" + std::to_string(cY));
       const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
-      putText(mOriginalImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-      putText(mOriginalImage, yPosString, Point(cX, cY + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-      putText(mOriginalImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255 , 255, 255), 1);
+      putText(aImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+      putText(aImage, yPosString, Point(cX, cY + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+      putText(aImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255 , 255, 255), 1);
   }
 }
 
