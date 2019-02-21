@@ -64,15 +64,12 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
     std::string colorStr = aShapeCommand.substr(0, delimiterPos);
     std::string shapeStr = aShapeCommand.substr(delimiterPos + 1);
 
-    // Entered commands
-    std::cout << "Entered shape command: " << aShapeCommand << std::endl;
-
+    // Convert strings
     mCurrentColor = StringToColor(colorStr);
     if (mCurrentColor == COLORS::UNKNOWNCOLOR)
     {
         std::cout << "Warning: unkown color" << std::endl;
     }
-
     mCurrentShape = StringToShape(shapeStr);
     if (mCurrentShape == SHAPES::UNKNOWNSHAPE)
     {
@@ -84,17 +81,24 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
     mOriginalImage.copyTo(mTresholdImage);
     mCurrentShapeCount = 0;
 
-    // Start timer
-    mClockStart = std::clock();
-    mMaskImage = detectColor(mCurrentColor);
+    recognize(); // run algorithm
+    draw(); // draw results
+}
+
+// Starts the detection algorithm
+void Shapedetector::recognize()
+{
+    mClockStart = std::clock(); // Start timer
+    mMaskImage = detectColor(mCurrentColor); // Start algorithm
     detectShape(mCurrentShape);
+    mClockEnd = std::clock(); // Stop timer
+}
 
-    // Stop timer
-    mClockEnd = std::clock();
-
-    // Put timer value in image
-    setTimeValue(mDisplayImage, mClockStart, mClockEnd);
-    setShapeFound(mDisplayImage);
+// Draws the windows and text
+void Shapedetector::draw()
+{
+    setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
+    setShapeFound(mDisplayImage); // draw found shapes
 
     // Show images
     imshow("result", mDisplayImage);

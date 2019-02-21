@@ -136,6 +136,10 @@ class Shapedetector
     Shapedetector(std::string aImageFilePath);
     ~Shapedetector();
 
+    void draw();
+    void recognize();
+
+
     /**
      * @brief Handles a single shape command
      * @param aShapeCommand 
