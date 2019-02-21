@@ -15,48 +15,21 @@ const int BATCH_ARGCOUNT = 3;
 /// Global variables
 std::shared_ptr<Shapedetector> detector;
 
-void interactiveMode(std::string imgPath)
-{
-    Shapedetector shapeDetector(imgPath);
+// void interactiveMode(std::string imgPath)
+// {
+// int r = 50;
+// int range = 100;
+// createTrackbar("R", "mask", &r, range);
 
-    std::cout << "Entered interactive mode" << std::endl;
-    std::cout << "Please enter [kleur] [vorm]" << std::endl;
-    std::cout << "> ";
+// int pressedKey = waitKey(0);
+// if (pressedKey = ESC_KEY) { /* do something */ }
 
-    while (true)
-    {
-        std::string command;
-        getline(std::cin, command); // Get command
-
-        if (command == EXIT_COMMAND)
-        {
-            return;
-        }
-        else
-        {
-            shapeDetector.handleShapeCommand(command); // Start algorithm
-
-            imshow("result", shapeDetector.mDisplayImage);
-            moveWindow("result", 0, 0);
-            
-            imshow("mask", shapeDetector.mMaskImage);
-            moveWindow("mask", shapeDetector.mOriginalImage.cols, 0);
-        }
-    }
-
-    // int r = 50;
-    // int range = 100;
-    // createTrackbar("R", "mask", &r, range);
-
-    // int pressedKey = waitKey(0);
-    // if (pressedKey = ESC_KEY) { /* do something */ }
-
-    /*
+/*
 	Program flow:
 	1. set color (black, white, red, green, blue, yellow)
 	2. set shape (circle, halfCircle, square, rectangle, triangle)
 	*/
-}
+// }
 
 void batchMode()
 {
@@ -67,16 +40,28 @@ int main(int argc, char **argv)
 {
     std::string imgPath = argv[1];
 
-    if (argc >= INTERACTIVE_ARGCOUNT) // shapedetector [image]
+    if (argc >= INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // if 1 argument
     {
-        if (fileExists(imgPath)) // file found
+        Shapedetector shapeDetector(imgPath); // create shape detector
+
+        // Start gui
+        std::cout << "Entered interactive mode" << std::endl;
+        std::cout << "Please enter [kleur] [vorm]" << std::endl;
+
+        while (true)
         {
-            interactiveMode(imgPath);
-        }
-        else // error, no file
-        {
-            std::cout << "ERROR - Image File does not exist." << std::endl;
-            exit(0);
+            std::cout << "> ";
+            std::string command;
+            getline(std::cin, command); // Get command
+
+            if (command == EXIT_COMMAND)
+            {
+                break;
+            }
+            else
+            {
+                shapeDetector.handleShapeCommand(command); // Start algorithm
+            }
         }
     }
     else if (argc == BATCH_ARGCOUNT) // shapedetector [image] [batchfile]
@@ -94,7 +79,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        std::cout << "Invalid arguments, usage: \n\
+        std::cout << "Invalid arguments or filepath, usage: \n\
       Interactive mode: shapedetector [image]\n\
       Batch mode: shapedetector [image] [batchfile]\n"
                   << std::endl;
