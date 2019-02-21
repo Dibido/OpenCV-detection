@@ -82,13 +82,12 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
     mCurrentShapeCount = 0;
 
     recognize(); // run algorithm
-    draw(); // draw results
 }
 
 // Starts the detection algorithm
 void Shapedetector::recognize()
 {
-    mClockStart = std::clock(); // Start timer
+    mClockStart = std::clock();              // Start timer
     mMaskImage = detectColor(mCurrentColor); // Start algorithm
     detectShape(mCurrentShape);
     mClockEnd = std::clock(); // Stop timer
@@ -98,15 +97,13 @@ void Shapedetector::recognize()
 void Shapedetector::draw()
 {
     setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
-    setShapeFound(mDisplayImage); // draw found shapes
+    setShapeFound(mDisplayImage);                        // draw found shapes
 
     // Show images
     imshow("result", mDisplayImage);
     moveWindow("result", 0, 0);
     imshow("mask", mMaskImage);
     moveWindow("mask", mOriginalImage.cols, 0);
-
-    waitKey(0);
 }
 
 void Shapedetector::setShapeFound(Mat aImage)

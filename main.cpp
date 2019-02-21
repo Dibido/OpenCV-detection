@@ -44,13 +44,12 @@ int main(int argc, char **argv)
     {
         Shapedetector shapeDetector(imgPath); // create shape detector
 
-        // Start gui
-        std::cout << "Entered interactive mode" << std::endl;
-        std::cout << "Please enter [kleur] [vorm]" << std::endl;
-
         while (true)
         {
+            // Start gui
+            std::cout << "Please enter [kleur] [vorm]" << std::endl;
             std::cout << "> ";
+
             std::string command;
             getline(std::cin, command); // Get command
 
@@ -61,6 +60,11 @@ int main(int argc, char **argv)
             else
             {
                 shapeDetector.handleShapeCommand(command); // Start algorithm
+                shapeDetector.draw();                      // draw results
+
+                std::cout << "### Image recognition done ###" << std::endl;
+                std::cout << "Press any key to enter a new command" << std::endl;
+                waitKey(0); // wait for input
             }
         }
     }
