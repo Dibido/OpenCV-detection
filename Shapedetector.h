@@ -150,7 +150,6 @@ public:
   // Image matrices
   Mat mOriginalImage;
   Mat mDisplayImage;
-  Mat mMaskImage;
 
 private:
   // Private image matrices
@@ -158,6 +157,7 @@ private:
   Mat mGreyImage;
   Mat mTresholdImage;
   Mat mApproxImage;
+  Mat mMaskImage;
 
   // Functions
   /**
@@ -201,6 +201,8 @@ private:
      * @param aImage the image to set the count on
      */
   void setShapeFound(Mat aImage);
+
+  void removeCloseShapes(std::vector<Mat>& aContours);
 
   // Variables
   std::string mImagePath;

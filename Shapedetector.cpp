@@ -22,7 +22,7 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   mTresholdType = ThresholdTypes::THRESH_BINARY;
 
   // Set the Contours variables
-  mContourCenterMargin = 5;
+  mContourCenterMargin = 30;
   mCurrentShapeCount = 0;
   mEpsilonMultiply = 0.04;
   mMinContourSize = 500.0;
@@ -35,7 +35,7 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   mTimeYOffset = 20;
 
   // Set the color limits for color detection [0] = Min, [1] = Max
-  mBlueLimits[0] = Scalar(85, 40, 30);
+  mBlueLimits[0] = Scalar(85, 20, 20);
   mBlueLimits[1] = Scalar(135, 255, 255);
   mGreenLimits[0] = Scalar(40, 25, 25);
   mGreenLimits[1] = Scalar(80, 255, 255);
@@ -158,11 +158,47 @@ Mat Shapedetector::detectColor(COLORS aColor)
   return resultImage;
 }
 
+Point getContourCenter(Mat aContour)
+{
+  //Calculate center
+  Moments currentmoments = moments(aContour);
+  int centerX = (int)(currentmoments.m10 / currentmoments.m00);
+  int centerY = (int)(currentmoments.m01 / currentmoments.m00);
+  return Point(centerX, centerY);
+}
+
+void Shapedetector::removeCloseShapes(std::vector<Mat>& aContours)
+{
+  Point currentCenter;
+  Point compareCenter;;
+  for(int i = 0; i < aContours.size(); i++)
+  {
+    //Calculate center
+    currentCenter = getContourCenter(aContours.at(i));
+    //Remove duplicates
+    for(int j = 0; j < aContours.size(); j++)
+    {
+      if(j != i) // Not the same shape
+      {
+        compareCenter = getContourCenter(aContours.at(j));
+        int Xdiff = abs(currentCenter.x - compareCenter.x);
+        int Ydiff = abs(currentCenter.y - compareCenter.y);
+        //Shape is too close
+        if(Xdiff <= mContourCenterMargin && Ydiff <= mContourCenterMargin)
+        {
+          aContours.erase(aContours.begin() + j);
+        }
+      }
+    }
+  }
+}
+
 std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
 {
   GaussianBlur(mCurrentMask, mCurrentMask, mGaussianKernelsize, BorderTypes::BORDER_DEFAULT);
   adaptiveThreshold(mCurrentMask, mTresholdImage, 255, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, mTresholdType, 5, 2);
   findContours(mTresholdImage, mCurrentContours, CV_RETR_TREE, CHAIN_APPROX_NONE);
+  removeCloseShapes(mCurrentContours);
   switch (aShape)
   {
   case SHAPES::ALL:
@@ -292,18 +328,15 @@ void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)
 
 void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
 {
-  Moments currentmoments;
-  currentmoments = moments(aContour);
-  int cX = (int)(currentmoments.m10 / currentmoments.m00);
-  int cY = (int)(currentmoments.m01 / currentmoments.m00);
-  const std::string xPosString = std::string("X:" + std::to_string(cX));
-  const std::string yPosString = std::string("Y:" + std::to_string(cY));
+  Point currentCenter = getContourCenter(aContour);
+  const std::string xPosString = std::string("X:" + std::to_string(currentCenter.x));
+  const std::string yPosString = std::string("Y:" + std::to_string(currentCenter.y));
   const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
 
   // Place values in the image
-  putText(aImage, xPosString, Point(cX, cY), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-  putText(aImage, yPosString, Point(cX, cY + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
-  putText(aImage, areaString, Point(cX, cY + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+  putText(aImage, xPosString, Point(currentCenter.x, currentCenter.y), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+  putText(aImage, yPosString, Point(currentCenter.x, currentCenter.y + mTextOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
+  putText(aImage, areaString, Point(currentCenter.x, currentCenter.y + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
 
   // Print to stdout
   std::cout << xPosString << " " << yPosString << " " << areaString << std::endl;
