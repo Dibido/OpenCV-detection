@@ -6,6 +6,32 @@ In this mode the program reads its commands from a file and executes them in ord
 * Interactive mode:  
 In this mode the program gets issued commands from the commandline interface until an exit command is entered.
 
+## Software design
+The functions prototypes for the filters are as follows:  
+```
+Mat Foo(const Mat& aMat)
+{
+  Mat result;
+  result.change();
+  return result;
+}
+```
+
+## Tasks
+
+|Task|
+|----|
+|Batch mode implementeren|
+|Per lijn afhandelen|
+|Comments negeren|
+|Calibratie|
+|Kleuren|
+|Vormen|
+|Cirkel herkennen|
+|Halve cirkel herkennen|
+|Meer filters maken|
+
+
 ## Compilation instructions
 This program has been created using CMake. Use the following commands to compile:  
 ``` Bash
