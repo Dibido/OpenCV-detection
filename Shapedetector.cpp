@@ -118,8 +118,12 @@ void Shapedetector::draw()
 
 void Shapedetector::setShapeFound(Mat aImage)
 {
-  const std::string shapeCountText = ShapeToString(mCurrentShape) + " count :" + std::to_string(mCurrentShapeCount);
-  std::cout << shapeCountText << std::endl;
+  const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
+
+
+  std::cout << "\tShapes found:\t" << shapeCountText << std::endl;
+  
+  
   putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
@@ -344,9 +348,9 @@ void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)
 void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
 {
   Point currentCenter = getContourCenter(aContour);
-  const std::string xPosString = std::string("X:" + std::to_string(currentCenter.x));
-  const std::string yPosString = std::string("Y:" + std::to_string(currentCenter.y));
-  const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
+  const std::string xPosString = std::string("X: " + std::to_string(currentCenter.x));
+  const std::string yPosString = std::string("Y: " + std::to_string(currentCenter.y));
+  const std::string areaString = std::string("A: " + std::to_string((int)contourArea(aContour)));
 
   // Place values in the image
   putText(aImage, xPosString, Point(currentCenter.x, currentCenter.y), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
@@ -354,13 +358,13 @@ void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
   putText(aImage, areaString, Point(currentCenter.x, currentCenter.y + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
 
   // Print to stdout
-  std::cout << xPosString << " " << yPosString << " " << areaString << std::endl;
+  std::cout << "\tShape location:\t" << xPosString << "\t" << yPosString << "\t" << areaString << std::endl;
 }
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
 {
-  std::cout << std::fixed << std::setprecision(2) << "CPU time used: " << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
+  std::cout << std::fixed << std::setprecision(2) << "\tCPU time used:\t" << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
   double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
-  const std::string timeText = std::string("T:" + std::to_string(calcTime) + "ms");
+  const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
   putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
