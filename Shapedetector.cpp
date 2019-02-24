@@ -349,13 +349,3 @@ void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock
   const std::string timeText = std::string("T:" + std::to_string(calcTime) + "ms");
   putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
-
-// ########################################################
-// ### Filters
-// ########################################################
-
-Mat Shapedetector::removeColors(const Mat& aMat)
-{
-  Mat result = mGreyImage;
-  return result;
-}
