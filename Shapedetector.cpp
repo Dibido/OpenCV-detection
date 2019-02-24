@@ -170,7 +170,7 @@ Point getContourCenter(Mat aContour)
 void Shapedetector::removeCloseShapes(std::vector<Mat>& aContours)
 {
   Point currentCenter;
-  Point compareCenter;;
+  Point compareCenter;
   for(int i = 0; i < aContours.size(); i++)
   {
     //Calculate center
@@ -348,4 +348,14 @@ void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock
   double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
   const std::string timeText = std::string("T:" + std::to_string(calcTime) + "ms");
   putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
+}
+
+// ########################################################
+// ### Filters
+// ########################################################
+
+Mat Shapedetector::removeColors(const Mat& aMat)
+{
+  Mat result = mGreyImage;
+  return result;
 }
