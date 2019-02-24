@@ -73,8 +73,8 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
   mOriginalImage.copyTo(mTresholdImage);
   mCurrentShapeCount = 0;
 
-  recognize();                             // run algorithm
-  draw();                                  // draw results
+  recognize(); // run algorithm
+  draw();      // draw results
 }
 
 // Starts the detection algorithm
@@ -83,7 +83,7 @@ void Shapedetector::recognize()
   mClockStart = std::clock();              // Start timer
   mMaskImage = detectColor(mCurrentColor); // Start algorithm
   detectShape(mCurrentShape);
-  mClockEnd = std::clock();                            // Stop timer
+  mClockEnd = std::clock(); // Stop timer
 }
 
 // Draws the windows and text
@@ -92,11 +92,26 @@ void Shapedetector::draw()
   setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
   setShapeFound(mDisplayImage);                        // draw found shapes
 
-  // Show images
-  imshow("result", mDisplayImage);
-  moveWindow("result", 0, 0);
-  imshow("mask", mMaskImage);
-  moveWindow("mask", mOriginalImage.cols, 0);
+  const int WIDTH = 300;
+  const int HEIGHT = WIDTH * 1080 / 1920;
+
+  // Show original
+  namedWindow("Original", WINDOW_NORMAL);
+  imshow("Original", mOriginalImage);
+  moveWindow("Original", 0, 0);
+  resizeWindow("Original", WIDTH, HEIGHT);
+
+  // Show mask (optional)
+  namedWindow("Mask", WINDOW_NORMAL);
+  imshow("Mask", mMaskImage);
+  moveWindow("Mask", WIDTH, 0);
+  resizeWindow("Mask", WIDTH, HEIGHT);
+
+  // Show result
+  namedWindow("Result", WINDOW_NORMAL);
+  imshow("Result", mDisplayImage);
+  moveWindow("Result", WIDTH * 2, 0);
+  resizeWindow("Result", WIDTH, HEIGHT);
 
   waitKey(0);
 }
@@ -167,24 +182,24 @@ Point getContourCenter(Mat aContour)
   return Point(centerX, centerY);
 }
 
-void Shapedetector::removeCloseShapes(std::vector<Mat>& aContours)
+void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
 {
   Point currentCenter;
   Point compareCenter;
-  for(int i = 0; i < aContours.size(); i++)
+  for (int i = 0; i < aContours.size(); i++)
   {
     //Calculate center
     currentCenter = getContourCenter(aContours.at(i));
     //Remove duplicates
-    for(int j = 0; j < aContours.size(); j++)
+    for (int j = 0; j < aContours.size(); j++)
     {
-      if(j != i) // Not the same shape
+      if (j != i) // Not the same shape
       {
         compareCenter = getContourCenter(aContours.at(j));
         int Xdiff = abs(currentCenter.x - compareCenter.x);
         int Ydiff = abs(currentCenter.y - compareCenter.y);
         //Shape is too close
-        if(Xdiff <= mContourCenterMargin && Ydiff <= mContourCenterMargin)
+        if (Xdiff <= mContourCenterMargin && Ydiff <= mContourCenterMargin)
         {
           aContours.erase(aContours.begin() + j);
         }

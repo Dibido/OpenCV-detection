@@ -25,7 +25,7 @@ int main(int argc, char **argv)
 
     // Start GUI
     std::cout << "Entered interactive mode" << std::endl;
-    std::cout << "Please enter [kleur] [vorm]" << std::endl;
+    std::cout << "Please enter [vorm] [kleur]" << std::endl;
 
     while (true)
     {
