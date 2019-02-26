@@ -45,8 +45,8 @@ Shapedetector::Shapedetector(std::string aImageFilePath, bool isBatchMode) : mIm
   // Set the color limits for color detection [0] = Min, [1] = Max
   mBlueLimits[0] = Scalar(85, 20, 20);
   mBlueLimits[1] = Scalar(135, 255, 255);
-  mGreenLimits[0] = Scalar(40, 25, 25);
-  mGreenLimits[1] = Scalar(80, 255, 255);
+  mGreenLimits[0] = Scalar(40, 20, 20);
+  mGreenLimits[1] = Scalar(90, 255, 255);
   mRedLimits[0] = Scalar(0, 60, 60);
   mRedLimits[1] = Scalar(10, 255, 255);
   mRedLimits[2] = Scalar(170, 60, 60);
@@ -129,8 +129,8 @@ void Shapedetector::recognize()
   cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
   imshow("brightened", brightenedBGRImage);
   // Blur
-  Mat blurredHSVImage;
-  GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(5,5), 0);
+  // Mat blurredHSVImage;
+  // GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(5,5), 0);
   // Filter color
   mMaskImage = detectColor(mCurrentColor, brightenedHSVImage);
   // Remove noise

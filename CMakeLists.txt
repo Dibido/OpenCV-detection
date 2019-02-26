@@ -11,6 +11,7 @@ target_link_libraries(shapedetector ${OpenCV_LIBS})
 
 if ( CMAKE_COMPILER_IS_GNUCC )
     target_compile_options(shapedetector PRIVATE "-Wall")
+    target_compile_options(shapedetector PRIVATE "-g")
     target_compile_options(shapedetector PRIVATE "-Wextra")
     target_compile_options(shapedetector PRIVATE "-Wconversion")
 endif()
