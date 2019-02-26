@@ -14,7 +14,7 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
   cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
 
   // Set the blur variables
-  mGaussianKernelsize = Size(3, 3);
+  mGaussianKernelsize = Size(5, 5);
 
   // Set the treshold variables
   mMinTreshold = 120;
@@ -171,12 +171,12 @@ void Shapedetector::removeCloseShapes(std::vector<Mat>& aContours)
 {
   Point currentCenter;
   Point compareCenter;;
-  for(int i = 0; i < aContours.size(); i++)
+  for(size_t i = 0; i < aContours.size(); i++)
   {
     //Calculate center
     currentCenter = getContourCenter(aContours.at(i));
     //Remove duplicates
-    for(int j = 0; j < aContours.size(); j++)
+    for(size_t j = 0; j < aContours.size(); j++)
     {
       if(j != i) // Not the same shape
       {
@@ -197,13 +197,13 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
 {
   GaussianBlur(mCurrentMask, mCurrentMask, mGaussianKernelsize, BorderTypes::BORDER_DEFAULT);
   adaptiveThreshold(mCurrentMask, mTresholdImage, 255, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, mTresholdType, 5, 2);
-  findContours(mTresholdImage, mCurrentContours, CV_RETR_TREE, CHAIN_APPROX_NONE);
+  findContours(mTresholdImage, mCurrentContours, CV_RETR_CCOMP, CHAIN_APPROX_NONE);
   removeCloseShapes(mCurrentContours);
   switch (aShape)
   {
   case SHAPES::ALL:
   {
-    for (int i = 0; i < mCurrentContours.size(); i++)
+    for (size_t i = 0; i < mCurrentContours.size(); i++)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
@@ -222,7 +222,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   }
   case SHAPES::SQUARE:
   {
-    for (int i = 0; i < mCurrentContours.size(); i++)
+    for (size_t i = 0; i < mCurrentContours.size(); i++)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
@@ -244,7 +244,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   }
   case SHAPES::RECTANGLE:
   {
-    for (int i = 0; i < mCurrentContours.size(); i++)
+    for (size_t i = 0; i < mCurrentContours.size(); i++)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
@@ -266,7 +266,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   }
   case SHAPES::TRIANGLE:
   {
-    for (int i = 0; i < mCurrentContours.size(); i++)
+    for (size_t i = 0; i < mCurrentContours.size(); i++)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
@@ -288,7 +288,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape)
   }
   case SHAPES::CIRCLE:
   {
-    for (int i = 0; i < mCurrentContours.size(); i++)
+    for (size_t i = 0; i < mCurrentContours.size(); i++)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
