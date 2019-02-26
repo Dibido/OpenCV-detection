@@ -42,34 +42,33 @@ enum COLORS
 
 // Strings
 static const std::vector<std::string> SHAPESTRINGS =
-{
-  "alles",
-  "cirkel",
-  "halfcirkel",
-  "vierkant",
-  "rechthoek",
-  "driehoek",
-  "onbekend"
-};
+    {
+        "alles",
+        "cirkel",
+        "halfcirkel",
+        "vierkant",
+        "rechthoek",
+        "driehoek",
+        "onbekend"};
 static const std::vector<std::string> COLORSTRINGS =
-{
-  "rood",
-  "groen",
-  "blauw",
-  "zwart",
-  "geel",
-  "wit",
-  "onbekend"
-};
+    {
+        "rood",
+        "groen",
+        "blauw",
+        "zwart",
+        "geel",
+        "wit",
+        "onbekend"};
 
 // Shape converters
 inline std::string ShapeToString(SHAPES aShape)
 {
   return SHAPESTRINGS[aShape];
 }
+
 inline SHAPES StringToShape(std::string aShapeString)
 {
-  SHAPES result = UNKNOWNSHAPE;
+  SHAPES result = SHAPES::UNKNOWNSHAPE;
 
   for (size_t i = 0; i < SHAPESTRINGS.size(); i++)
   {
@@ -78,6 +77,12 @@ inline SHAPES StringToShape(std::string aShapeString)
       result = SHAPES(i);
     }
   }
+
+  if (result == SHAPES::UNKNOWNSHAPE)
+  {
+    std::cout << "Warning: \"" << aShapeString << "\" is not a valid shape" << std::endl;
+  }
+
   return result;
 }
 
@@ -86,6 +91,7 @@ inline std::string ColorToString(COLORS aColor)
 {
   return COLORSTRINGS[aColor];
 }
+
 inline COLORS StringToColor(std::string aColorString)
 {
   COLORS result = COLORS::UNKNOWNCOLOR;
@@ -97,6 +103,12 @@ inline COLORS StringToColor(std::string aColorString)
       result = COLORS(i);
     }
   }
+
+  if (result == COLORS::UNKNOWNCOLOR)
+  {
+    std::cout << "Warning: \"" << aColorString << "\" is not a valid color" << std::endl;
+  }
+
   return result;
 }
 
@@ -152,57 +164,12 @@ public:
   Mat mDisplayImage;
 
 private:
-  // Private image matrices
+  // Image matrices
   Mat mHSVImage;
   Mat mGreyImage;
   Mat mTresholdImage;
   Mat mApproxImage;
   Mat mMaskImage;
-
-  // Functions
-  /**
-     * @brief Detect a color in an image
-     * @param aColor the color to detect
-     * @return Mat a Mask with the current color filter
-     */
-  Mat detectColor(COLORS aColor);
-
-  /**
-     * @brief Detect a shape in an image
-     * @param aShape the shape to detect
-     * @return std::vector<Mat> The contours of the found shapes
-     */
-  std::vector<Mat> detectShape(SHAPES aShape);
-
-  /**
-     * @brief Set the X/Y/Area in the center of the shape
-     * @param aImage The image to set the values on
-     * @param aContour The contour to place the values in
-     */
-  void setShapeValues(Mat aImage, Mat aContour);
-
-  /**
-     * @brief Set the Time in the image
-     * @param aImage The image to set the time in
-     * @param aStartTime The start time
-     * @param aEndTime The end time
-     */
-  void setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime);
-
-  /**
-     * @brief Draws the contours of a shape
-     * @param aImage The image to draw on
-     * @param aContour The contours to draw
-     */
-  void drawShapeContours(Mat aImage, Mat aContour);
-
-  /**
-     * @brief Set the count of shapes found
-     * @param aImage the image to set the count on
-     */
-  void setShapeFound(Mat aImage);
-
-  void removeCloseShapes(std::vector<Mat>& aContours);
 
   // Variables
   std::string mImagePath;
@@ -253,6 +220,50 @@ private:
   // Text variables
   int mTextOffset;
   double mTextSize;
+
+      /**
+ * @brief Detect a color in an image
+ * @param aColor the color to detect
+ * @return Mat a Mask with the current color filter
+ */
+      Mat detectColor(COLORS aColor);
+
+  /**
+     * @brief Detect a shape in an image
+     * @param aShape the shape to detect
+     * @return std::vector<Mat> The contours of the found shapes
+     */
+  std::vector<Mat> detectShape(SHAPES aShape);
+
+  /**
+     * @brief Set the X/Y/Area in the center of the shape
+     * @param aImage The image to set the values on
+     * @param aContour The contour to place the values in
+     */
+  void setShapeValues(Mat aImage, Mat aContour);
+
+  /**
+     * @brief Set the Time in the image
+     * @param aImage The image to set the time in
+     * @param aStartTime The start time
+     * @param aEndTime The end time
+     */
+  void setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime);
+
+  /**
+     * @brief Draws the contours of a shape
+     * @param aImage The image to draw on
+     * @param aContour The contours to draw
+     */
+  void drawShapeContours(Mat aImage, Mat aContour);
+
+  /**
+     * @brief Set the count of shapes found
+     * @param aImage the image to set the count on
+     */
+  void setShapeFound(Mat aImage);
+
+  void removeCloseShapes(std::vector<Mat> &aContours);
 };
 
 #endif

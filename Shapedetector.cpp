@@ -73,8 +73,8 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
   mOriginalImage.copyTo(mTresholdImage);
   mCurrentShapeCount = 0;
 
-  recognize();                             // run algorithm
-  draw();                                  // draw results
+  recognize(); // run algorithm
+  draw();      // draw results
 }
 
 // Starts the detection algorithm
@@ -83,7 +83,7 @@ void Shapedetector::recognize()
   mClockStart = std::clock();              // Start timer
   mMaskImage = detectColor(mCurrentColor); // Start algorithm
   detectShape(mCurrentShape);
-  mClockEnd = std::clock();                            // Stop timer
+  mClockEnd = std::clock(); // Stop timer
 }
 
 // Draws the windows and text
@@ -92,19 +92,38 @@ void Shapedetector::draw()
   setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
   setShapeFound(mDisplayImage);                        // draw found shapes
 
-  // Show images
-  imshow("result", mDisplayImage);
-  moveWindow("result", 0, 0);
-  imshow("mask", mMaskImage);
-  moveWindow("mask", mOriginalImage.cols, 0);
+  const int WIDTH = 300;
+  const int HEIGHT = WIDTH * 1080 / 1920;
+
+  // Show original
+  namedWindow("Original", WINDOW_NORMAL);
+  imshow("Original", mOriginalImage);
+  moveWindow("Original", 0, 0);
+  resizeWindow("Original", WIDTH, HEIGHT);
+
+  // Show mask (optional)
+  namedWindow("Mask", WINDOW_NORMAL);
+  imshow("Mask", mMaskImage);
+  moveWindow("Mask", WIDTH, 0);
+  resizeWindow("Mask", WIDTH, HEIGHT);
+
+  // Show result
+  namedWindow("Result", WINDOW_NORMAL);
+  imshow("Result", mDisplayImage);
+  moveWindow("Result", WIDTH * 2, 0);
+  resizeWindow("Result", WIDTH, HEIGHT);
 
   waitKey(0);
 }
 
 void Shapedetector::setShapeFound(Mat aImage)
 {
-  const std::string shapeCountText = ShapeToString(mCurrentShape) + " count :" + std::to_string(mCurrentShapeCount);
-  std::cout << shapeCountText << std::endl;
+  const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
+
+
+  std::cout << "\tShapes found:\t" << shapeCountText << std::endl;
+  
+  
   putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
@@ -167,24 +186,33 @@ Point getContourCenter(Mat aContour)
   return Point(centerX, centerY);
 }
 
-void Shapedetector::removeCloseShapes(std::vector<Mat>& aContours)
+void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
 {
   Point currentCenter;
+<<<<<<< HEAD
+  Point compareCenter;
+  for (int i = 0; i < aContours.size(); i++)
+=======
   Point compareCenter;;
   for(size_t i = 0; i < aContours.size(); i++)
+>>>>>>> 885d9f225371383520bfe574e8493b322b525d20
   {
     //Calculate center
     currentCenter = getContourCenter(aContours.at(i));
     //Remove duplicates
+<<<<<<< HEAD
+    for (int j = 0; j < aContours.size(); j++)
+=======
     for(size_t j = 0; j < aContours.size(); j++)
+>>>>>>> 885d9f225371383520bfe574e8493b322b525d20
     {
-      if(j != i) // Not the same shape
+      if (j != i) // Not the same shape
       {
         compareCenter = getContourCenter(aContours.at(j));
         int Xdiff = abs(currentCenter.x - compareCenter.x);
         int Ydiff = abs(currentCenter.y - compareCenter.y);
         //Shape is too close
-        if(Xdiff <= mContourCenterMargin && Ydiff <= mContourCenterMargin)
+        if (Xdiff <= mContourCenterMargin && Ydiff <= mContourCenterMargin)
         {
           aContours.erase(aContours.begin() + j);
         }
@@ -329,9 +357,9 @@ void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)
 void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
 {
   Point currentCenter = getContourCenter(aContour);
-  const std::string xPosString = std::string("X:" + std::to_string(currentCenter.x));
-  const std::string yPosString = std::string("Y:" + std::to_string(currentCenter.y));
-  const std::string areaString = std::string("A:" + std::to_string((int)contourArea(aContour)));
+  const std::string xPosString = std::string("X: " + std::to_string(currentCenter.x));
+  const std::string yPosString = std::string("Y: " + std::to_string(currentCenter.y));
+  const std::string areaString = std::string("A: " + std::to_string((int)contourArea(aContour)));
 
   // Place values in the image
   putText(aImage, xPosString, Point(currentCenter.x, currentCenter.y), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
@@ -339,13 +367,13 @@ void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
   putText(aImage, areaString, Point(currentCenter.x, currentCenter.y + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
 
   // Print to stdout
-  std::cout << xPosString << " " << yPosString << " " << areaString << std::endl;
+  std::cout << "\tShape location:\t" << xPosString << "\t" << yPosString << "\t" << areaString << std::endl;
 }
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
 {
-  std::cout << std::fixed << std::setprecision(2) << "CPU time used: " << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
+  std::cout << std::fixed << std::setprecision(2) << "\tCPU time used:\t" << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
   double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
-  const std::string timeText = std::string("T:" + std::to_string(calcTime) + "ms");
+  const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
   putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
