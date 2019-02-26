@@ -171,8 +171,13 @@ private:
   Mat mApproxImage;
   Mat mMaskImage;
 
-  // Variables
+  // Program variables
   std::string mImagePath;
+
+  // Calibration variables
+  int mBlurSliderValue;
+  int mContrastSliderValue;
+  int mNoiseSliderValue;
 
   // Current command values
   COLORS mCurrentColor;
@@ -226,14 +231,14 @@ private:
  * @param aColor the color to detect
  * @return Mat a Mask with the current color filter
  */
-      Mat detectColor(COLORS aColor);
+  Mat detectColor(COLORS aColor, Mat aImage);
 
   /**
      * @brief Detect a shape in an image
      * @param aShape the shape to detect
      * @return std::vector<Mat> The contours of the found shapes
      */
-  std::vector<Mat> detectShape(SHAPES aShape);
+  std::vector<Mat> detectShape(SHAPES aShape, Mat aShapeMask);
 
   /**
      * @brief Set the X/Y/Area in the center of the shape
@@ -263,7 +268,26 @@ private:
      */
   void setShapeFound(Mat aImage);
 
+  /**
+   * @brief Get the center point of a contour
+   */
+  Point getContourCenter(Mat aContour);
+
+  /**
+   * @brief remove the shapes where the center point is too close to another shape
+   * @param aContours the contours to check
+   */
   void removeCloseShapes(std::vector<Mat> &aContours);
+
+  /**
+   * @brief Callback for setting the slider values in the program
+   */
+  static void onChange(int, void *);
+
+  /**
+   * @brief filters the noise from the image
+   */
+  Mat removeNoise(Mat aImage);
 };
 
 #endif
