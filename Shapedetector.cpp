@@ -127,10 +127,10 @@ void Shapedetector::recognize()
   Mat brightenedHSVImage;
   mOriginalImage.convertTo(brightenedBGRImage, -1, 1, 40);
   cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
-  imshow("brightened", brightenedBGRImage);
+  // imshow("brightened", brightenedBGRImage);
   // Blur
   // Mat blurredHSVImage;
-  // GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(5,5), 0);
+  // GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
   // Filter color
   mMaskImage = detectColor(mCurrentColor, brightenedHSVImage);
   // Remove noise

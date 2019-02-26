@@ -3,7 +3,7 @@
 std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
 {
   // adaptiveThreshold(aShapeMask, mTresholdImage, 255, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, mTresholdType, 11, 2);
-  findContours(aShapeMask, mCurrentContours, CV_RETR_CCOMP, CHAIN_APPROX_NONE);
+  findContours(aShapeMask, mCurrentContours, CV_RETR_EXTERNAL, CHAIN_APPROX_NONE);
   // removeCloseShapes(mCurrentContours);
   switch (aShape)
   {
