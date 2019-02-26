@@ -4,6 +4,7 @@ project(shapedetector)
 set(CMAKE_CXX_CPPCHECK "cppcheck")
 
 set (CMAKE_CXX_STANDARD 14)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 find_package(OpenCV 3.2.0 REQUIRED)
 
 add_executable(shapedetector main.cpp DetectColor.cpp DetectShapes.cpp Shapedetector.cpp )
