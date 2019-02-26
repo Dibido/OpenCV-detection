@@ -1,3 +1,5 @@
 # Ignored comment
-square red
-circle blue
+vierkant rood
+cirkel blauw
+vierkant groen
+driehoek rood

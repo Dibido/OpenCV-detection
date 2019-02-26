@@ -7,7 +7,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
   // removeCloseShapes(mCurrentContours);
   switch (aShape)
   {
-  case SHAPES::ALL:
+  case SHAPES::ALL_SHAPES:
   {
     for (size_t i = 0; i < mCurrentContours.size(); i++)
     {
@@ -32,7 +32,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height == 4)
+      if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
       {
         if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
         {
@@ -54,7 +54,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height == 4)
+      if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
       {
         if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
         {
@@ -76,7 +76,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
     {
       double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height == 3)
+      if (mApproxImage.size().height == TRIANGLE_CORNERCOUNT)
       {
         if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
         {
