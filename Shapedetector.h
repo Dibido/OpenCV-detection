@@ -152,6 +152,7 @@ class Shapedetector
 {
 public:
   Shapedetector(std::string aImageFilePath, bool batchMode);
+  Shapedetector(Mat aImage, bool batchMode);
   ~Shapedetector();
 
   void draw();
@@ -235,7 +236,12 @@ private:
   unsigned int mScreenDrawWidth;
   unsigned int mScreenDrawHeight;
 
-      /**
+  /**
+   * @brief Initialize the class values
+   */
+  void initializeValues();
+
+  /**
  * @brief Detect a color in an image
  * @param aColor the color to detect
  * @return Mat a Mask with the current color filter
