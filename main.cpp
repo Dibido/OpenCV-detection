@@ -1,6 +1,9 @@
 /// Library
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <memory>
 
 /// Local
@@ -11,9 +14,7 @@
 const std::string EXIT_COMMAND = "exit";
 const int INTERACTIVE_ARGCOUNT = 2;
 const int BATCH_ARGCOUNT = 3;
-
-/// Global variables
-std::shared_ptr<Shapedetector> detector;
+const char COMMENT_CHARACTER = '#';
 
 int main(int argc, char **argv)
 {
@@ -21,7 +22,7 @@ int main(int argc, char **argv)
 
   if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
   {
-    Shapedetector shapeDetector(imgPath); // create shape detector
+    Shapedetector shapeDetector(imgPath, false); // create shape detector
 
     // Start GUI
     std::cout << "### Interactive mode ###" << std::endl;
@@ -47,12 +48,25 @@ int main(int argc, char **argv)
       }
     }
   }
-  else if (argc == BATCH_ARGCOUNT) // shapedetector [image] [batchfile]
+  else if (argc == BATCH_ARGCOUNT && fileExists(imgPath)) // shapedetector [image] [batchfile]
   {
+    Shapedetector shapeDetector(imgPath, true); // create shape detector
+    // Start batchmode
     std::cout << "### Batch mode ###" << std::endl;
     if (fileExists(argv[2]))
     {
       //TODO: Implement batch mode
+      std::string line;
+      std::ifstream batchFile(argv[2]);
+      while (std::getline(batchFile, line))
+      {
+        // Ignore comments
+        if(line.at(0) != COMMENT_CHARACTER)
+        {
+          std::cout << line << std::endl;
+          shapeDetector.handleShapeCommand(line);
+        }
+      }
     }
     else
     {

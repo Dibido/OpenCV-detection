@@ -18,10 +18,14 @@
 // Namespace
 using namespace cv;
 
+// Defines
+#define SQUARE_CORNERCOUNT 4
+#define TRIANGLE_CORNERCOUNT 3
+
 // Enums
 enum SHAPES
 {
-  ALL,
+  ALL_SHAPES,
   CIRCLE,
   HALFCIRCLE,
   SQUARE,
@@ -66,13 +70,13 @@ inline std::string ShapeToString(SHAPES aShape)
   return SHAPESTRINGS[aShape];
 }
 
-inline SHAPES StringToShape(std::string aShapeString)
+inline SHAPES StringToShape(const std::string& aShapeString)
 {
   SHAPES result = SHAPES::UNKNOWNSHAPE;
 
   for (size_t i = 0; i < SHAPESTRINGS.size(); i++)
   {
-    if (aShapeString == SHAPESTRINGS[i])
+    if (aShapeString == SHAPESTRINGS.at(i))
     {
       result = SHAPES(i);
     }
@@ -92,7 +96,7 @@ inline std::string ColorToString(COLORS aColor)
   return COLORSTRINGS[aColor];
 }
 
-inline COLORS StringToColor(std::string aColorString)
+inline COLORS StringToColor(const std::string& aColorString)
 {
   COLORS result = COLORS::UNKNOWNCOLOR;
 
@@ -147,7 +151,7 @@ inline bool fileExists(const std::string &aFilePath)
 class Shapedetector
 {
 public:
-  Shapedetector(std::string aImageFilePath);
+  Shapedetector(std::string aImageFilePath, bool batchMode);
   ~Shapedetector();
 
   void draw();
@@ -164,6 +168,9 @@ public:
   Mat mDisplayImage;
 
 private:
+  // Program variables
+  std::string mImagePath;
+  bool mBatchMode;
   // Image matrices
   Mat mHSVImage;
   Mat mGreyImage;
@@ -171,8 +178,11 @@ private:
   Mat mApproxImage;
   Mat mMaskImage;
 
-  // Variables
-  std::string mImagePath;
+
+  // Calibration variables
+  int mBlurSliderValue;
+  int mContrastSliderValue;
+  int mNoiseSliderValue;
 
   // Current command values
   COLORS mCurrentColor;
@@ -221,19 +231,23 @@ private:
   int mTextOffset;
   double mTextSize;
 
+  // Draw size
+  unsigned int mScreenDrawWidth;
+  unsigned int mScreenDrawHeight;
+
       /**
  * @brief Detect a color in an image
  * @param aColor the color to detect
  * @return Mat a Mask with the current color filter
  */
-      Mat detectColor(COLORS aColor);
+  Mat detectColor(COLORS aColor, Mat aImage);
 
   /**
      * @brief Detect a shape in an image
      * @param aShape the shape to detect
      * @return std::vector<Mat> The contours of the found shapes
      */
-  std::vector<Mat> detectShape(SHAPES aShape);
+  std::vector<Mat> detectShape(SHAPES aShape, Mat aShapeMask);
 
   /**
      * @brief Set the X/Y/Area in the center of the shape
@@ -263,7 +277,40 @@ private:
      */
   void setShapeFound(Mat aImage);
 
+  /**
+   * @brief Get the center point of a contour
+   */
+  Point getContourCenter(Mat aContour);
+
+  /**
+   * @brief remove the shapes where the center point is too close to another shape
+   * @param aContours the contours to check
+   */
   void removeCloseShapes(std::vector<Mat> &aContours);
+
+  /**
+   * @brief Callback for setting the slider values in the program
+   */
+  static void onChange(int, void *);
+
+  /**
+   * @brief filters the noise from the image
+   */
+  Mat removeNoise(Mat aImage);
+
+  /**
+   * @brief Print the data from the detection to the console
+   */
+  void printDetectionData();
+  
+  /**
+   * @brief print the time taken to the console
+   */
+  void printTimeValue(std::clock_t aStartTime, std::clock_t aEndTime);
+  /**
+   * @brief print the number of shapes found to the console
+   */
+  void printShapeFound();
 };
 
 #endif
