@@ -13,6 +13,23 @@ Shapedetector::Shapedetector(std::string aImageFilePath, bool isBatchMode) : mIm
   cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
   cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
 
+  initializeValues();
+}
+
+Shapedetector::Shapedetector(Mat aImage, bool isBatchMode) : mBatchMode(isBatchMode)
+{
+  // Store origininal image
+  mOriginalImage = aImage;
+  mOriginalImage.copyTo(mDisplayImage);
+  mOriginalImage.copyTo(mTresholdImage);
+
+  // Convert to necessary formats
+  cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
+  cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+}
+
+void Shapedetector::initializeValues()
+{
   // Set the calibration variables
   mBlurSliderValue = 0;
   mContrastSliderValue = 0;
@@ -125,14 +142,14 @@ void Shapedetector::recognize()
   // Brighten
   Mat brightenedBGRImage;
   Mat brightenedHSVImage;
-  mOriginalImage.convertTo(brightenedBGRImage, -1, 1, 40);
+  mOriginalImage.convertTo(brightenedBGRImage, -1, 1, mContrastSliderValue);
   cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
-  // imshow("brightened", brightenedBGRImage);
+  imshow("brightened", brightenedBGRImage);
   // Blur
-  // Mat blurredHSVImage;
-  // GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
+  Mat blurredHSVImage;
+  GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
   // Filter color
-  mMaskImage = detectColor(mCurrentColor, brightenedHSVImage);
+  mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
   // Remove noise
   Mat removedNoise = removeNoise(mMaskImage);
   // Detect shapes
