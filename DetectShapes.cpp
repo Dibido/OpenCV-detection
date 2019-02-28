@@ -2,9 +2,7 @@
 
 std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
 {
-  // adaptiveThreshold(aShapeMask, mTresholdImage, 255, AdaptiveThresholdTypes::ADAPTIVE_THRESH_MEAN_C, mTresholdType, 11, 2);
   findContours(aShapeMask, mCurrentContours, CV_RETR_EXTERNAL, CHAIN_APPROX_NONE);
-  // removeCloseShapes(mCurrentContours);
   switch (aShape)
   {
   case SHAPES::ALL_SHAPES:
@@ -44,7 +42,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
           std::vector<Point> rectPoints;
           Rect boundedRect = boundingRect(mCurrentContours.at(i));
           float ratio = (float)boundedRect.width / (float)boundedRect.height;
-          if(ratio > 0.95 && ratio < 1.05)
+          if(ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
           {
             mCurrentShapeCount++;
             drawShapeContours(mDisplayImage, mCurrentContours.at(i));
@@ -63,7 +61,6 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
       {
-        std::cout << mApproxImage.size() << std::endl;
         if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
         {
           //Ignore small or huge shapes

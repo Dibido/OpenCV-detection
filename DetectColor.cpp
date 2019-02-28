@@ -45,7 +45,5 @@ Mat Shapedetector::detectColor(COLORS aColor, Mat aImage)
       break;
     }
   }
-  // resultMask.copyTo(mCurrentMask);
-  // mOriginalImage.copyTo(resultImage, resultMask);
   return resultMask;
 }

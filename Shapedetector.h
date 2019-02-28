@@ -229,6 +229,8 @@ private:
   int mMinTreshold;
   int mMaxTreshold;
   ThresholdTypes mTresholdType;
+  double mMinSquareRatio;
+  double mMaxSquareRatio;
 
   // Contour settings
   int mContourCenterMargin;

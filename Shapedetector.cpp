@@ -51,6 +51,8 @@ void Shapedetector::initializeValues()
     mMinTreshold = 120;
     mMaxTreshold = 255;
     mTresholdType = ThresholdTypes::THRESH_BINARY;
+    mMinSquareRatio = 0.85;
+    mMaxSquareRatio = 1.08;
 
     // Set the Contours variables
     mContourCenterMargin = 30;
@@ -66,7 +68,7 @@ void Shapedetector::initializeValues()
     mTimeYOffset = 20;
 
     // Set the color limits for color detection [0] = Min, [1] = Max
-    mBlueLimits[0] = Scalar(90, 55, 20);
+    mBlueLimits[0] = Scalar(95, 55, 20);
     mBlueLimits[1] = Scalar(135, 255, 255);
     // mGreenLimits[0] = Scalar(40, 20, 20);
     // mGreenLimits[1] = Scalar(90, 255, 255);
@@ -123,12 +125,11 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 
                 // Reshow images
                 imshow("Original", mOriginalImage);
+                imshow("Color", mMaskImage);
+                imshow("Result", mDisplayImage);
 
                 imshow("Brightness", mBrightenedRgbImage);
                 imshow("Blur", mBlurredImage);
-                imshow("Color", mMaskImage);
-
-                imshow("Result", mDisplayImage);
 
                 int keyPressed = waitKey(30);
                 if (keyPressed == 27) // ESC key
@@ -172,9 +173,9 @@ void Shapedetector::draw()
     resizeWindow("Original", mScreenDrawWidth, mScreenDrawHeight);
 
     // Show mask (optional)
-    namedWindow("Mask", WINDOW_NORMAL);
-    moveWindow("Mask", mScreenDrawWidth, 0);
-    resizeWindow("Mask", mScreenDrawWidth, mScreenDrawHeight);
+    namedWindow("Color", WINDOW_NORMAL);
+    moveWindow("Color", mScreenDrawWidth, 0);
+    resizeWindow("Color", mScreenDrawWidth, mScreenDrawHeight);
 
     // Show result
     namedWindow("Result", WINDOW_NORMAL);
