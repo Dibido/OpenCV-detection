@@ -115,11 +115,9 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
                     cap.retrieve(mOriginalImage);
                 }
                 reset();     // reset images and values
-                
                 recognize(); // run algorithm
 
-                std::cout << "contrast = " << mContrastSliderValue << std::endl;
-
+                // Reshow images
                 imshow("Original", mOriginalImage);
                 imshow("Mask", mMaskImage);
                 imshow("Result", mDisplayImage);
@@ -127,6 +125,7 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
                 int keyPressed = waitKey(30);
                 if (keyPressed == 27) // ESC key
                 {
+                    destroyAllWindows();
                     break;
                 }
             }
