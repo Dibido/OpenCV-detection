@@ -179,7 +179,6 @@ private:
   Mat mApproxImage;
   Mat mMaskImage;
 
-
   // Calibration variables
   int mBlurSliderValue;
   int mContrastSliderValue;

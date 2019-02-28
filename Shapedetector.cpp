@@ -82,7 +82,7 @@ Shapedetector::~Shapedetector()
 }
 
 // Shape detectors "main"
-void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
+void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 {
   // Parse command
   std::size_t delimiterPos = aShapeCommand.find(' ');
@@ -93,7 +93,7 @@ void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
   mCurrentColor = StringToColor(colorStr);
   mCurrentShape = StringToShape(shapeStr);
 
-  if(mCurrentColor == COLORS::UNKNOWNCOLOR || mCurrentShape == SHAPES::UNKNOWNSHAPE)
+  if (mCurrentColor == COLORS::UNKNOWNCOLOR || mCurrentShape == SHAPES::UNKNOWNSHAPE)
   {
     std::cout << "Invalid command" << std::endl;
   }
@@ -105,7 +105,7 @@ void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
     mCurrentShapeCount = 0;
 
     recognize(); // run algorithm
-    if(!mBatchMode)
+    if (!mBatchMode)
     {
       draw(); // draw results
     }
@@ -136,26 +136,33 @@ void Shapedetector::printShapeFound()
 // Starts the detection algorithm
 void Shapedetector::recognize()
 {
-  mClockStart = std::clock();              // Start timer
+  mClockStart = std::clock(); // Start timer
 
+  //////////////////////
   // Apply filters
+  //////////////////////
+
   // Brighten
   Mat brightenedBGRImage;
   Mat brightenedHSVImage;
   mOriginalImage.convertTo(brightenedBGRImage, -1, 1, mContrastSliderValue);
   cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
   imshow("brightened", brightenedBGRImage);
+
   // Blur
   Mat blurredHSVImage;
   GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
+
   // Filter color
   mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
+
   // Remove noise
   Mat removedNoise = removeNoise(mMaskImage);
+
   // Detect shapes
   detectShape(mCurrentShape, removedNoise);
-  
-  mClockEnd = std::clock();               // Stop timer
+
+  mClockEnd = std::clock(); // Stop timer
 }
 
 // Draws the windows and text
@@ -164,41 +171,48 @@ void Shapedetector::draw()
   setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
   setShapeFound(mDisplayImage);                        // draw found shapes
 
-  // Show original
-  namedWindow("Original", WINDOW_NORMAL);
-  imshow("Original", mOriginalImage);
-  moveWindow("Original", 0, 0);
-  resizeWindow("Original", mScreenDrawWidth, mScreenDrawHeight);
+  while (true)
+  {
+    // Show original
+    namedWindow("Original", WINDOW_NORMAL);
+    imshow("Original", mOriginalImage);
+    moveWindow("Original", 0, 0);
+    resizeWindow("Original", mScreenDrawWidth, mScreenDrawHeight);
 
-  // Show mask (optional)
-  namedWindow("Mask", WINDOW_NORMAL);
-  imshow("Mask", mMaskImage);
-  moveWindow("Mask", mScreenDrawWidth, 0);
-  resizeWindow("Mask", mScreenDrawWidth, mScreenDrawHeight);
+    // Show mask (optional)
+    namedWindow("Mask", WINDOW_NORMAL);
+    imshow("Mask", mMaskImage);
+    moveWindow("Mask", mScreenDrawWidth, 0);
+    resizeWindow("Mask", mScreenDrawWidth, mScreenDrawHeight);
 
-  // Show result
-  namedWindow("Result", WINDOW_NORMAL);
-  imshow("Result", mDisplayImage);
-  moveWindow("Result", mScreenDrawWidth * 2, 0);
-  resizeWindow("Result", mScreenDrawWidth, mScreenDrawHeight);
+    // Show result
+    namedWindow("Result", WINDOW_NORMAL);
+    imshow("Result", mDisplayImage);
+    moveWindow("Result", mScreenDrawWidth * 2, 0);
+    resizeWindow("Result", mScreenDrawWidth, mScreenDrawHeight);
 
-  int blur = 0;
-  int contrast = 0;
-  int noise = 0;
-  namedWindow("Sliders");
-  createTrackbar("Blur", "Sliders", &blur, 255, onChange);
-  createTrackbar("Contrast", "Sliders", &contrast, 255, onChange);
-  createTrackbar("Noise", "Sliders", &noise, 255, onChange);
-  moveWindow("Sliders", 0, mScreenDrawHeight);
+    namedWindow("Sliders");
+    createTrackbar("Blur", "Sliders", &mBlurSliderValue, 255, onChange, this);
+    createTrackbar("Contrast", "Sliders", &mContrastSliderValue, 255, onChange, this);
+    createTrackbar("Noise", "Sliders", &mNoiseSliderValue, 255, onChange, this);
+    moveWindow("Sliders", 0, mOriginalImage.rows + 20);
 
-  waitKey(0);
+    int pressedKey = waitKey(30);
+    if (pressedKey == 32) // SPACE key
+    {
+      recognize();
+    }
+    if (pressedKey == 27) // ESC key
+    {
+      break;
+    }
+  }
 }
 
-void Shapedetector::onChange(int, void *)
+void Shapedetector::onChange(int, void *aShapeDetector)
 {
-  // Set blur
-  // Set contrast
-  // Set noise
+  // Shapedetector *shapeDetect = static_cast<Shapedetector *>(aShapeDetector);
+  // shapeDetect->recognize();
 }
 
 void Shapedetector::setShapeFound(Mat aImage)
