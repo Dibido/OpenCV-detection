@@ -165,20 +165,23 @@ public:
      */
   void handleShapeCommand(const std::string &aShapeCommand);
 
-  // Image matrices
-  Mat mOriginalImage;
-  Mat mDisplayImage;
+  // Image matrices to show
+  Mat mOriginalImage;      // original
+  Mat mBrightenedRgbImage; // brightness image
+  Mat mBlurredImage;       // blurred image
+  Mat mMaskImage;          // color filtered image
+  Mat mDisplayImage;       // image with shape outlines
 
 private:
   // Program variables
   std::string mImagePath;
   bool mBatchMode;
+
   // Image matrices
   Mat mHSVImage;
   Mat mGreyImage;
   Mat mTresholdImage;
   Mat mApproxImage;
-  Mat mMaskImage;
 
   // Slider values
   int mBlurSliderValue;

@@ -123,7 +123,11 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 
                 // Reshow images
                 imshow("Original", mOriginalImage);
-                imshow("Mask", mMaskImage);
+
+                imshow("Brightness", mBrightenedRgbImage);
+                imshow("Blur", mBlurredImage);
+                imshow("Color", mMaskImage);
+
                 imshow("Result", mDisplayImage);
 
                 int keyPressed = waitKey(30);
@@ -177,10 +181,14 @@ void Shapedetector::draw()
     moveWindow("Result", mScreenDrawWidth * 2, 0);
     resizeWindow("Result", mScreenDrawWidth, mScreenDrawHeight);
 
+    // resizeWindow("Brightness", mScreenDrawWidth, mScreenDrawHeight);
+    // resizeWindow("Blur", mScreenDrawWidth, mScreenDrawHeight);
+    // resizeWindow("Color", mScreenDrawWidth, mScreenDrawHeight);
+
     // Sliders
     namedWindow("Sliders");
+    createTrackbar("Brightness", "Sliders", &mContrastSliderValue, mContrastSliderRange, onChange, this);
     createTrackbar("Blur", "Sliders", &mBlurSliderValue, mBlurSliderRange, onChange, this);
-    createTrackbar("Contrast", "Sliders", &mContrastSliderValue, mContrastSliderRange, onChange, this);
     createTrackbar("Noise", "Sliders", &mNoiseSliderValue, mNoiseSliderRange, onChange, this);
     moveWindow("Sliders", 0, mOriginalImage.rows + 20);
 }
@@ -210,7 +218,8 @@ void Shapedetector::recognize()
     ////////////////////////////////////////
     // Constrain/manipulate slider values
     ////////////////////////////////////////
-    mNoiseSliderValue++; // noiseValue must be > 0
+
+    mNoiseSliderValue++;           // noiseValue must be > 0
     if (mBlurSliderValue % 2 == 0) // blur kernel size must be an odd value
     {
         mBlurSliderValue++;
@@ -220,26 +229,30 @@ void Shapedetector::recognize()
     // Apply filters
     //////////////////////
 
-    // Brighten
+    // 1. Change brightness
     Mat brightenedBGRImage;
     Mat brightenedHSVImage;
     mOriginalImage.convertTo(brightenedBGRImage, -1, 1, mContrastSliderValue);
     cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
+    mBrightenedRgbImage = brightenedBGRImage;
 
-    // Blur
+    // 2. Blur
     Mat blurredHSVImage;
     Size blurValue = Size(mBlurSliderValue, mBlurSliderValue);
     GaussianBlur(brightenedHSVImage, blurredHSVImage, blurValue, 0);
+    cvtColor(blurredHSVImage, mBlurredImage, COLOR_HSV2BGR); // save blurred output
 
-    // Filter color
+    // 3. Filter color
     mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
 
-    // Remove noise
+    // 4. Remove noise
     Mat removedNoise = removeNoise(mMaskImage);
 
+    //////////////////
     // Detect shapes
-    detectShape(mCurrentShape, removedNoise);
+    //////////////////
 
+    detectShape(mCurrentShape, removedNoise);
     mClockEnd = std::clock(); // Stop timer
 }
 
@@ -266,6 +279,6 @@ Mat Shapedetector::removeNoise(Mat aImage)
 {
     Mat result;
     Mat structure = getStructuringElement(MORPH_RECT, Size(mNoiseSliderValue, mNoiseSliderValue));
-    morphologyEx(aImage, result, MORPH_OPEN, structure);
+    // morphologyEx(aImage, result, MORPH_OPEN, structure);
     return result;
 }
