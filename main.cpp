@@ -11,126 +11,41 @@
 #include "Shapedetector.h"
 #include "Camera.h"
 
-/// Constants
-const std::string EXIT_COMMAND = "exit";
-const int INTERACTIVE_ARGCOUNT = 2;
-const int BATCH_ARGCOUNT = 3;
-const char COMMENT_CHARACTER = '#';
-
 int main(int argc, char **argv)
 {
-    std::string imgPath = argv[1];
+    // COMMANDS
+    // ./shapedetector interactive [device id]
+    // ./shapedetector batch [file]
 
-    if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
+    // EXAMPLES
+    // ./shapedetector interactive 1
+    // ./shapedetector batch ../batch.txt
+
+    if (argc > 1)
     {
-        Shapedetector shapeDetector(imgPath, false); // create shape detector
+        std::string imgPath = argv[1];
+        Shapedetector shapeDetector(argv[1]); // create shape detector
 
-        // Start GUI
-        std::cout << "### Interactive mode ###" << std::endl;
-
-        while (true)
+        if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
         {
-            std::cout << "Please enter [vorm] [kleur]" << std::endl;
-            std::cout << "> ";
-            std::string command;
-            getline(std::cin, command); // Get command
-
-            if (command != EXIT_COMMAND)
-            {
-                shapeDetector.handleShapeCommand(command); // Start algorithm
-            }
-            else if (command == EXIT_COMMAND)
-            {
-                std::cout << "Closing program.." << std::endl;
-                break;
-            }
-            else
-            {
-                break;
-            }
+            shapeDetector.startCommandline();
         }
-    }
-    else if (argc == INTERACTIVE_ARGCOUNT)
-    {
-        // Set pretake cam framecount
-        const int WEBCAM_START_IMAGES = 10;
-        // Check input
-        int deviceId = atoi(argv[1]);
-        // Read image from webcam
-        VideoCapture cap;
-        Mat capturedImage;
-        cap.open(deviceId);
-        if (cap.isOpened())
+        else if (argc == INTERACTIVE_ARGCOUNT)
         {
-            for (size_t i = 0; i < WEBCAM_START_IMAGES; i++)
-            {
-                cap.grab();
-                cap.retrieve(capturedImage);
-            }
-            cap.retrieve(capturedImage);
-            cap.release();
-            imwrite("webcamblocks1.png", capturedImage);
+            shapeDetector.webcamMode(atoi(argv[1]));
         }
-        // Start webcam mode
-        std::cout << "### Webcam mode ###" << std::endl;
-        std::cout << "Please enter [vorm] [kleur]" << std::endl;
-
-        Shapedetector shapeDetector(capturedImage, false); // create shape detector
-
-        while (true)
+        else if (argc == BATCH_ARGCOUNT && fileExists(imgPath)) // shapedetector [image] [batchfile]
         {
-            std::cout << "> ";
-            std::string command;
-            getline(std::cin, command); // Get command
-
-            if (command != EXIT_COMMAND)
-            {
-                shapeDetector.handleShapeCommand(command); // Start algorithm
-            }
-            else if (command == EXIT_COMMAND)
-            {
-                std::cout << "Closing program.." << std::endl;
-                break;
-            }
-            else
-            {
-                break;
-            }
-        }
-    }
-    else if (argc == BATCH_ARGCOUNT && fileExists(imgPath)) // shapedetector [image] [batchfile]
-    {
-        Shapedetector shapeDetector(imgPath, true); // create shape detector
-        // Start batchmode
-        std::cout << "### Batch mode ###" << std::endl;
-        if (fileExists(argv[2]))
-        {
-            std::string line;
-            std::ifstream batchFile(argv[2]);
-            while (std::getline(batchFile, line))
-            {
-                // Ignore comments
-                if (line.at(0) != COMMENT_CHARACTER)
-                {
-                    std::cout << line << std::endl;
-                    shapeDetector.handleShapeCommand(line);
-                }
-            }
-        }
-        else
-        {
-            std::cout << "ERROR - Batchfile does not exist." << std::endl;
-            exit(0);
+            shapeDetector.batchMode(argv[2]);
         }
     }
     else
     {
-        std::cout << "Invalid arguments or filepath, usage: \n\
-      Webcam mode: shapedetector [device id]\n\
-      Interactive mode: shapedetector [image]\n\
-      Batch mode: shapedetector [image] [batchfile]\n"
-                  << std::endl;
-        exit(0);
+        std::cout << "Error: invalid arguments or filepath, usage:" << std::endl;
+        std::cout << "\tWebcam mode:\t\tshapedetector [device id]" << std::endl;
+        std::cout << "\tInteractive mode:\tshapedetector [image]" << std::endl;
+        std::cout << "\tBatch mode:\t\tshapedetector [image] [batchfile]" << std::endl;
     }
+
     return 0;
 }
