@@ -180,10 +180,15 @@ private:
   Mat mApproxImage;
   Mat mMaskImage;
 
-  // Calibration variables
+  // Slider values
   int mBlurSliderValue;
   int mContrastSliderValue;
   int mNoiseSliderValue;
+
+  // Slider ranges
+  int mBlurSliderRange;
+  int mContrastSliderRange;
+  int mNoiseSliderRange;
 
   // Current command values
   COLORS mCurrentColor;
