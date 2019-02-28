@@ -70,7 +70,7 @@ inline std::string ShapeToString(SHAPES aShape)
   return SHAPESTRINGS[aShape];
 }
 
-inline SHAPES StringToShape(const std::string& aShapeString)
+inline SHAPES StringToShape(const std::string &aShapeString)
 {
   SHAPES result = SHAPES::UNKNOWNSHAPE;
 
@@ -96,7 +96,7 @@ inline std::string ColorToString(COLORS aColor)
   return COLORSTRINGS[aColor];
 }
 
-inline COLORS StringToColor(const std::string& aColorString)
+inline COLORS StringToColor(const std::string &aColorString)
 {
   COLORS result = COLORS::UNKNOWNCOLOR;
 
@@ -155,6 +155,7 @@ public:
   Shapedetector(Mat aImage, bool batchMode);
   ~Shapedetector();
 
+  void reset();
   void draw();
   void recognize();
 
@@ -164,25 +165,33 @@ public:
      */
   void handleShapeCommand(const std::string &aShapeCommand);
 
-  // Image matrices
-  Mat mOriginalImage;
-  Mat mDisplayImage;
+  // Image matrices to show
+  Mat mOriginalImage;      // original
+  Mat mBrightenedRgbImage; // brightness image
+  Mat mBlurredImage;       // blurred image
+  Mat mMaskImage;          // color filtered image
+  Mat mDisplayImage;       // image with shape outlines
 
 private:
   // Program variables
   std::string mImagePath;
   bool mBatchMode;
+
   // Image matrices
   Mat mHSVImage;
   Mat mGreyImage;
   Mat mTresholdImage;
   Mat mApproxImage;
-  Mat mMaskImage;
 
-  // Calibration variables
+  // Slider values
   int mBlurSliderValue;
   int mContrastSliderValue;
   int mNoiseSliderValue;
+
+  // Slider ranges
+  int mBlurSliderRange;
+  int mContrastSliderRange;
+  int mNoiseSliderRange;
 
   // Current command values
   COLORS mCurrentColor;
@@ -307,7 +316,7 @@ private:
    * @brief Print the data from the detection to the console
    */
   void printDetectionData();
-  
+
   /**
    * @brief print the time taken to the console
    */
