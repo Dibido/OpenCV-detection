@@ -27,10 +27,9 @@ int main(int argc, char **argv)
 
     // Start GUI
     std::cout << "### Interactive mode ###" << std::endl;
-    std::cout << "Please enter [vorm] [kleur]" << std::endl;
-
     while (true)
     {
+      std::cout << "Please enter [vorm] [kleur]" << std::endl;
       std::cout << "> ";
       std::string command;
       getline(std::cin, command); // Get command
