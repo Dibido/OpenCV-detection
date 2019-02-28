@@ -40,9 +40,16 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
         }
         else
         {
-          mCurrentShapeCount++;
-          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+          //Check if it is a square
+          std::vector<Point> rectPoints;
+          Rect boundedRect = boundingRect(mCurrentContours.at(i));
+          float ratio = (float)boundedRect.width / (float)boundedRect.height;
+          if(ratio > 0.95 && ratio < 1.05)
+          {
+            mCurrentShapeCount++;
+            drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+            setShapeValues(mDisplayImage, mCurrentContours.at(i));
+          }
         }
       }
     }
@@ -56,6 +63,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
       approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
       if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
       {
+        std::cout << mApproxImage.size() << std::endl;
         if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
         {
           //Ignore small or huge shapes
@@ -116,6 +124,8 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
   }
   case SHAPES::HALFCIRCLE:
   {
+    // TODO: find half circles
+
     break;
   }
   case SHAPES::UNKNOWNSHAPE:
