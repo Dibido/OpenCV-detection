@@ -4,80 +4,80 @@
 // Constructor
 Shapedetector::Shapedetector(std::string aImageFilePath, bool isBatchMode) : mImagePath(aImageFilePath), mBatchMode(isBatchMode)
 {
-  // Store origininal image
-  mOriginalImage = imread(mImagePath);
-  mOriginalImage.copyTo(mDisplayImage);
-  mOriginalImage.copyTo(mTresholdImage);
+    // Store origininal image
+    mOriginalImage = imread(mImagePath);
+    mOriginalImage.copyTo(mDisplayImage);
+    mOriginalImage.copyTo(mTresholdImage);
 
-  // Convert to necessary formats
-  cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
-  cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+    // Convert to necessary formats
+    cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
+    cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
 
-  initializeValues();
+    initializeValues();
 }
 
 Shapedetector::Shapedetector(Mat aImage, bool isBatchMode) : mBatchMode(isBatchMode)
 {
-  // Store origininal image
-  mOriginalImage = aImage;
-  mOriginalImage.copyTo(mDisplayImage);
-  mOriginalImage.copyTo(mTresholdImage);
+    // Store origininal image
+    mOriginalImage = aImage;
+    mOriginalImage.copyTo(mDisplayImage);
+    mOriginalImage.copyTo(mTresholdImage);
 
-  // Convert to necessary formats
-  cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
-  cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+    // Convert to necessary formats
+    cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
+    cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
 
-  initializeValues();
+    initializeValues();
 }
 
 void Shapedetector::initializeValues()
 {
-  // Set the calibration variables
-  mBlurSliderValue = 0;
-  mContrastSliderValue = 0;
-  mNoiseSliderValue = 0;
+    // Set the calibration variables
+    mBlurSliderValue = 0;
+    mContrastSliderValue = 0;
+    mNoiseSliderValue = 0;
 
-  mScreenDrawWidth = 500;
-  mScreenDrawHeight = mScreenDrawWidth * 1080 / 1920;
+    mScreenDrawWidth = 500;
+    mScreenDrawHeight = mScreenDrawWidth * 1080 / 1920;
 
-  // Set the blur variables
-  mGaussianKernelsize = Size(3, 3);
+    // Set the blur variables
+    mGaussianKernelsize = Size(3, 3);
 
-  // Set the treshold variables
-  mMinTreshold = 120;
-  mMaxTreshold = 255;
-  mTresholdType = ThresholdTypes::THRESH_BINARY;
+    // Set the treshold variables
+    mMinTreshold = 120;
+    mMaxTreshold = 255;
+    mTresholdType = ThresholdTypes::THRESH_BINARY;
 
-  // Set the Contours variables
-  mContourCenterMargin = 30;
-  mCurrentShapeCount = 0;
-  mEpsilonMultiply = 0.04;
-  mMinContourSize = 500.0;
-  mMaxContourSize = 30000.0;
-  mTextOffset = 20;
-  mTextSize = 0.5;
+    // Set the Contours variables
+    mContourCenterMargin = 30;
+    mCurrentShapeCount = 0;
+    mEpsilonMultiply = 0.04;
+    mMinContourSize = 500.0;
+    mMaxContourSize = 30000.0;
+    mTextOffset = 20;
+    mTextSize = 0.5;
 
-  // Set the timer variables
-  mTimeXOffset = 20;
-  mTimeYOffset = 20;
+    // Set the timer variables
+    mTimeXOffset = 20;
+    mTimeYOffset = 20;
 
-  // Set the color limits for color detection [0] = Min, [1] = Max
-  mBlueLimits[0] = Scalar(90, 55, 20);
-  mBlueLimits[1] = Scalar(135, 255, 255);
-  // mGreenLimits[0] = Scalar(40, 20, 20);
-  // mGreenLimits[1] = Scalar(90, 255, 255);
-  mGreenLimits[0] = Scalar(25, 45, 24);
-  mGreenLimits[1] = Scalar(90, 255, 130);
-  mRedLimits[0] = Scalar(0, 60, 60);
-  mRedLimits[1] = Scalar(10, 255, 255);
-  mRedLimits[2] = Scalar(170, 60, 60);
-  mRedLimits[3] = Scalar(180, 255, 255);
-  mBlackLimits[0] = Scalar(0, 0, 0);
-  mBlackLimits[1] = Scalar(255, 100, 100);
-  mYellowLimits[0] = Scalar(25, 60, 60);
-  mYellowLimits[1] = Scalar(45, 255, 255);
-  mWhiteLimits[0] = Scalar(15, 40, 30); // Is woodcolor instead of white
-  mWhiteLimits[1] = Scalar(25, 255, 255);
+    // Set the color limits for color detection [0] = Min, [1] = Max
+    mBlueLimits[0] = Scalar(90, 55, 20);
+    mBlueLimits[1] = Scalar(135, 255, 255);
+    // mGreenLimits[0] = Scalar(40, 20, 20);
+    // mGreenLimits[1] = Scalar(90, 255, 255);
+    mGreenLimits[0] = Scalar(25, 45, 24);
+    mGreenLimits[1] = Scalar(90, 255, 130);
+    mRedLimits[0] = Scalar(0, 60, 60);
+    mRedLimits[1] = Scalar(10, 255, 255);
+    mRedLimits[2] = Scalar(170, 60, 60);
+    mRedLimits[3] = Scalar(180, 255, 255);
+    mBlackLimits[0] = Scalar(0, 0, 0);
+    mBlackLimits[1] = Scalar(255, 100, 100);
+    mYellowLimits[0] = Scalar(25, 60, 60);
+    mYellowLimits[1] = Scalar(45, 255, 255);
+    mWhiteLimits[0] = Scalar(15, 40, 30); // Is woodcolor instead of white
+    mWhiteLimits[1] = Scalar(25, 255, 255);
 }
 
 // Destructor
@@ -88,173 +88,173 @@ Shapedetector::~Shapedetector()
 // Shape detectors "main"
 void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 {
-  // Parse command
-  std::size_t delimiterPos = aShapeCommand.find(' ');
-  std::string shapeStr = aShapeCommand.substr(0, delimiterPos);
-  std::string colorStr = aShapeCommand.substr(delimiterPos + 1);
+    // Parse command
+    std::size_t delimiterPos = aShapeCommand.find(' ');
+    std::string shapeStr = aShapeCommand.substr(0, delimiterPos);
+    std::string colorStr = aShapeCommand.substr(delimiterPos + 1);
 
-  // Convert strings
-  mCurrentColor = StringToColor(colorStr);
-  mCurrentShape = StringToShape(shapeStr);
+    // Convert strings
+    mCurrentColor = StringToColor(colorStr);
+    mCurrentShape = StringToShape(shapeStr);
 
-  VideoCapture cap;
-  cap.open(1);
+    VideoCapture cap;
+    cap.open(1);
 
-  if(mCurrentColor == COLORS::UNKNOWNCOLOR || mCurrentShape == SHAPES::UNKNOWNSHAPE)
-  {
-    std::cout << "Invalid command" << std::endl;
-  }
-  else
-  {
-    while(true)
+    if (mCurrentColor != COLORS::UNKNOWNCOLOR || mCurrentShape != SHAPES::UNKNOWNSHAPE)
     {
-      // Get new frame
-      if(cap.isOpened())
-      {
-        cap.grab();
-        cap.retrieve(mOriginalImage);
-      }
-      // Reset values
-      mOriginalImage.copyTo(mDisplayImage);
-      mOriginalImage.copyTo(mTresholdImage);
-      cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
-      mCurrentShapeCount = 0;
+        if (mBatchMode == false)
+        {
+            draw(); // draw windows and sliders (once)
 
-      recognize(); // run algorithm
-      if(!mBatchMode)
-      {
-        draw(); // draw results
-      }
-      else
-      {
-        printDetectionData(); // Print data
-      }
-      int keyPressed = waitKey(30);
-      if(keyPressed == 27) // Escape is pressed
-      {
-        break;
-      }
+            while (true)
+            {
+                // Get new frame
+                if (cap.isOpened())
+                {
+                    cap.grab();
+                    cap.retrieve(mOriginalImage);
+                }
+                reset();     // reset images and values
+                
+                recognize(); // run algorithm
+
+                std::cout << "contrast = " << mContrastSliderValue << std::endl;
+
+                imshow("Original", mOriginalImage);
+                imshow("Mask", mMaskImage);
+                imshow("Result", mDisplayImage);
+
+                int keyPressed = waitKey(30);
+                if (keyPressed == 27) // ESC key
+                {
+                    break;
+                }
+            }
+        }
+        else // batchMode == true
+        {
+            reset();              // reset images and values
+            recognize();          // run algorithm
+            printDetectionData(); // Print data
+        }
     }
-  }
+    else
+    {
+        std::cout << "Invalid command" << std::endl;
+    }
 }
 
-void Shapedetector::printDetectionData()
+void Shapedetector::reset()
 {
-  printTimeValue(mClockStart, mClockEnd);
-  printShapeFound();
-}
-
-void Shapedetector::printTimeValue(std::clock_t aStartTime, std::clock_t aEndTime)
-{
-  std::cout << std::fixed << std::setprecision(2) << "\tCPU time used:\t" << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
-}
-
-void Shapedetector::printShapeFound()
-{
-  const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
-  std::cout << "\tShapes found:\t" << shapeCountText << std::endl;
-}
-
-// Starts the detection algorithm
-void Shapedetector::recognize()
-{
-  mClockStart = std::clock(); // Start timer
-
-  //////////////////////
-  // Apply filters
-  //////////////////////
-
-  // Brighten
-  Mat brightenedBGRImage;
-  Mat brightenedHSVImage;
-  mOriginalImage.convertTo(brightenedBGRImage, -1, 1, 40);
-  cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
-  // imshow("brightened", brightenedBGRImage);
-  // Blur
-  Mat blurredHSVImage;
-  GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
-
-  // Filter color
-  mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
-
-  // Remove noise
-  Mat removedNoise = removeNoise(mMaskImage);
-
-  // Detect shapes
-  detectShape(mCurrentShape, removedNoise);
-
-  mClockEnd = std::clock(); // Stop timer
+    // Reload frames
+    mOriginalImage.copyTo(mDisplayImage);
+    mOriginalImage.copyTo(mTresholdImage);
+    cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+    mCurrentShapeCount = 0; // Reset shape count
 }
 
 // Draws the windows and text
 void Shapedetector::draw()
 {
-  setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
-  setShapeFound(mDisplayImage);                        // draw found shapes
+    setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
+    setShapeFound(mDisplayImage);                        // draw found shapes
 
-  while (true)
-  {
     // Show original
     namedWindow("Original", WINDOW_NORMAL);
-    imshow("Original", mOriginalImage);
     moveWindow("Original", 0, 0);
     resizeWindow("Original", mScreenDrawWidth, mScreenDrawHeight);
 
     // Show mask (optional)
     namedWindow("Mask", WINDOW_NORMAL);
-    imshow("Mask", mMaskImage);
     moveWindow("Mask", mScreenDrawWidth, 0);
     resizeWindow("Mask", mScreenDrawWidth, mScreenDrawHeight);
 
     // Show result
     namedWindow("Result", WINDOW_NORMAL);
-    imshow("Result", mDisplayImage);
     moveWindow("Result", mScreenDrawWidth * 2, 0);
     resizeWindow("Result", mScreenDrawWidth, mScreenDrawHeight);
 
+    // Sliders
     namedWindow("Sliders");
     createTrackbar("Blur", "Sliders", &mBlurSliderValue, 255, onChange, this);
     createTrackbar("Contrast", "Sliders", &mContrastSliderValue, 255, onChange, this);
     createTrackbar("Noise", "Sliders", &mNoiseSliderValue, 255, onChange, this);
     moveWindow("Sliders", 0, mOriginalImage.rows + 20);
-
-    int pressedKey = waitKey(30);
-    if (pressedKey == 32) // SPACE key
-    {
-      recognize();
-    }
-    if (pressedKey == 27) // ESC key
-    {
-      break;
-    }
-  }
 }
 
-void Shapedetector::onChange(int, void*)
+void Shapedetector::printDetectionData()
 {
-  // Shapedetector *shapeDetect = static_cast<Shapedetector *>(aShapeDetector);
-  // shapeDetect->recognize();
+    printTimeValue(mClockStart, mClockEnd);
+    printShapeFound();
+}
+
+void Shapedetector::printTimeValue(std::clock_t aStartTime, std::clock_t aEndTime)
+{
+    std::cout << std::fixed << std::setprecision(2) << "\tCPU time used:\t" << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
+}
+
+void Shapedetector::printShapeFound()
+{
+    const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
+    std::cout << "\tShapes found:\t" << shapeCountText << std::endl;
+}
+
+// Starts the detection algorithm
+void Shapedetector::recognize()
+{
+    mClockStart = std::clock(); // Start timer
+
+    //////////////////////
+    // Apply filters
+    //////////////////////
+
+    // Brighten
+    Mat brightenedBGRImage;
+    Mat brightenedHSVImage;
+    mOriginalImage.convertTo(brightenedBGRImage, -1, 1, 40);
+    cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
+    // imshow("brightened", brightenedBGRImage);
+    // Blur
+    Mat blurredHSVImage;
+    GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
+
+    // Filter color
+    mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
+
+    // Remove noise
+    Mat removedNoise = removeNoise(mMaskImage);
+
+    // Detect shapes
+    detectShape(mCurrentShape, removedNoise);
+
+    mClockEnd = std::clock(); // Stop timer
+}
+
+void Shapedetector::onChange(int, void *)
+{
+    // Shapedetector *shapeDetect = static_cast<Shapedetector *>(aShapeDetector);
+    // shapeDetect->recognize();
 }
 
 void Shapedetector::setShapeFound(Mat aImage)
 {
-  const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
-  printShapeFound();
-  putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
+    const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
+    printShapeFound();
+    putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
 {
-  printTimeValue(aStartTime, aEndTime);
-  double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
-  const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
-  putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
+    printTimeValue(aStartTime, aEndTime);
+    double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
+    const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
+    putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
 Mat Shapedetector::removeNoise(Mat aImage)
 {
-  Mat result;
-  Mat structure = getStructuringElement(MORPH_RECT, Size(5, 5));
-  morphologyEx(aImage, result, MORPH_OPEN, structure);
-  return result;
+    Mat result;
+    Mat structure = getStructuringElement(MORPH_RECT, Size(5, 5));
+    morphologyEx(aImage, result, MORPH_OPEN, structure);
+    return result;
 }

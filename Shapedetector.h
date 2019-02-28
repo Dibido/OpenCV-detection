@@ -70,7 +70,7 @@ inline std::string ShapeToString(SHAPES aShape)
   return SHAPESTRINGS[aShape];
 }
 
-inline SHAPES StringToShape(const std::string& aShapeString)
+inline SHAPES StringToShape(const std::string &aShapeString)
 {
   SHAPES result = SHAPES::UNKNOWNSHAPE;
 
@@ -96,7 +96,7 @@ inline std::string ColorToString(COLORS aColor)
   return COLORSTRINGS[aColor];
 }
 
-inline COLORS StringToColor(const std::string& aColorString)
+inline COLORS StringToColor(const std::string &aColorString)
 {
   COLORS result = COLORS::UNKNOWNCOLOR;
 
@@ -155,6 +155,7 @@ public:
   Shapedetector(Mat aImage, bool batchMode);
   ~Shapedetector();
 
+  void reset();
   void draw();
   void recognize();
 
@@ -307,7 +308,7 @@ private:
    * @brief Print the data from the detection to the console
    */
   void printDetectionData();
-  
+
   /**
    * @brief print the time taken to the console
    */
