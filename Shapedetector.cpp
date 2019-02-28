@@ -218,8 +218,10 @@ void Shapedetector::recognize()
     ////////////////////////////////////////
     // Constrain/manipulate slider values
     ////////////////////////////////////////
-
-    mNoiseSliderValue++;           // noiseValue must be > 0
+    if(mNoiseSliderValue == 0)
+    {
+      mNoiseSliderValue++;           // noiseValue must be > 0
+    }
     if (mBlurSliderValue % 2 == 0) // blur kernel size must be an odd value
     {
         mBlurSliderValue++;
@@ -279,6 +281,7 @@ Mat Shapedetector::removeNoise(Mat aImage)
 {
     Mat result;
     Mat structure = getStructuringElement(MORPH_RECT, Size(mNoiseSliderValue, mNoiseSliderValue));
-    // morphologyEx(aImage, result, MORPH_OPEN, structure);
+    // Mat structure = getStructuringElement(MORPH_RECT, Size(3, 3));
+    morphologyEx(aImage, result, MORPH_OPEN, structure);
     return result;
 }
