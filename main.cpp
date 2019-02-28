@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   else if (argc == INTERACTIVE_ARGCOUNT)
   {
     // Set pretake cam framecount
-    const int WEBCAM_START_IMAGES = 5;
+    const int WEBCAM_START_IMAGES = 10;
     // Check input
     int deviceId = atoi(argv[1]);
     // Read image from webcam
@@ -68,6 +68,7 @@ int main(int argc, char **argv)
         cap.retrieve(capturedImage);
       }
       cap.retrieve(capturedImage);
+      cap.release();
       imwrite("webcamblocks1.png", capturedImage);
     }
     // Start webcam mode

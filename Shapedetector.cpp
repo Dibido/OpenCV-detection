@@ -26,6 +26,8 @@ Shapedetector::Shapedetector(Mat aImage, bool isBatchMode) : mBatchMode(isBatchM
   // Convert to necessary formats
   cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
   cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+
+  initializeValues();
 }
 
 void Shapedetector::initializeValues()
@@ -60,20 +62,22 @@ void Shapedetector::initializeValues()
   mTimeYOffset = 20;
 
   // Set the color limits for color detection [0] = Min, [1] = Max
-  mBlueLimits[0] = Scalar(85, 20, 20);
+  mBlueLimits[0] = Scalar(90, 55, 20);
   mBlueLimits[1] = Scalar(135, 255, 255);
-  mGreenLimits[0] = Scalar(40, 20, 20);
-  mGreenLimits[1] = Scalar(90, 255, 255);
+  // mGreenLimits[0] = Scalar(40, 20, 20);
+  // mGreenLimits[1] = Scalar(90, 255, 255);
+  mGreenLimits[0] = Scalar(25, 45, 24);
+  mGreenLimits[1] = Scalar(90, 255, 130);
   mRedLimits[0] = Scalar(0, 60, 60);
   mRedLimits[1] = Scalar(10, 255, 255);
   mRedLimits[2] = Scalar(170, 60, 60);
   mRedLimits[3] = Scalar(180, 255, 255);
   mBlackLimits[0] = Scalar(0, 0, 0);
   mBlackLimits[1] = Scalar(255, 100, 100);
-  mYellowLimits[0] = Scalar(20, 40, 30);
-  mYellowLimits[1] = Scalar(40, 255, 255);
-  mWhiteLimits[0] = Scalar(10, 40, 30); // Is woodcolor instead of white
-  mWhiteLimits[1] = Scalar(20, 255, 255);
+  mYellowLimits[0] = Scalar(25, 60, 60);
+  mYellowLimits[1] = Scalar(45, 255, 255);
+  mWhiteLimits[0] = Scalar(15, 40, 30); // Is woodcolor instead of white
+  mWhiteLimits[1] = Scalar(25, 255, 255);
 }
 
 // Destructor
@@ -93,25 +97,43 @@ void Shapedetector::handleShapeCommand(const std::string& aShapeCommand)
   mCurrentColor = StringToColor(colorStr);
   mCurrentShape = StringToShape(shapeStr);
 
+  VideoCapture cap;
+  cap.open(1);
+
   if(mCurrentColor == COLORS::UNKNOWNCOLOR || mCurrentShape == SHAPES::UNKNOWNSHAPE)
   {
     std::cout << "Invalid command" << std::endl;
   }
   else
   {
-    // Reset values
-    mOriginalImage.copyTo(mDisplayImage);
-    mOriginalImage.copyTo(mTresholdImage);
-    mCurrentShapeCount = 0;
+    while(true)
+    {
+      // Get new frame
+      if(cap.isOpened())
+      {
+        cap.grab();
+        cap.retrieve(mOriginalImage);
+      }
+      // Reset values
+      mOriginalImage.copyTo(mDisplayImage);
+      mOriginalImage.copyTo(mTresholdImage);
+      cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+      mCurrentShapeCount = 0;
 
-    recognize(); // run algorithm
-    if(!mBatchMode)
-    {
-      draw(); // draw results
-    }
-    else
-    {
-      printDetectionData(); // Print data
+      recognize(); // run algorithm
+      if(!mBatchMode)
+      {
+        draw(); // draw results
+      }
+      else
+      {
+        printDetectionData(); // Print data
+      }
+      int keyPressed = waitKey(30);
+      if(keyPressed == 27) // Escape is pressed
+      {
+        break;
+      }
     }
   }
 }
@@ -142,18 +164,19 @@ void Shapedetector::recognize()
   // Brighten
   Mat brightenedBGRImage;
   Mat brightenedHSVImage;
-  mOriginalImage.convertTo(brightenedBGRImage, -1, 1, mContrastSliderValue);
+  mOriginalImage.convertTo(brightenedBGRImage, -1, 1, 40);
   cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
-  imshow("brightened", brightenedBGRImage);
+  // imshow("brightened", brightenedBGRImage);
   // Blur
   Mat blurredHSVImage;
   GaussianBlur(brightenedHSVImage, blurredHSVImage, Size(3, 3), 0);
   // Filter color
   mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
+  // imshow("currentMask", mMaskImage);
   // Remove noise
-  Mat removedNoise = removeNoise(mMaskImage);
+  // Mat removedNoise = removeNoise(mMaskImage);
   // Detect shapes
-  detectShape(mCurrentShape, removedNoise);
+  detectShape(mCurrentShape, mMaskImage);
   
   mClockEnd = std::clock();               // Stop timer
 }
@@ -182,16 +205,16 @@ void Shapedetector::draw()
   moveWindow("Result", mScreenDrawWidth * 2, 0);
   resizeWindow("Result", mScreenDrawWidth, mScreenDrawHeight);
 
-  int blur = 0;
-  int contrast = 0;
-  int noise = 0;
-  namedWindow("Sliders");
-  createTrackbar("Blur", "Sliders", &blur, 255, onChange);
-  createTrackbar("Contrast", "Sliders", &contrast, 255, onChange);
-  createTrackbar("Noise", "Sliders", &noise, 255, onChange);
-  moveWindow("Sliders", 0, mScreenDrawHeight);
+  // int blur = 0;
+  // int contrast = 0;
+  // int noise = 0;
+  // namedWindow("Sliders");
+  // createTrackbar("Blur", "Sliders", &blur, 255, onChange);
+  // createTrackbar("Contrast", "Sliders", &contrast, 255, onChange);
+  // createTrackbar("Noise", "Sliders", &noise, 255, onChange);
+  // moveWindow("Sliders", 0, mScreenDrawHeight);
 
-  waitKey(0);
+  // waitKey(0);
 }
 
 void Shapedetector::onChange(int, void *)
