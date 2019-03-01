@@ -27,7 +27,6 @@ const std::string EXIT_COMMAND = "exit";
 const std::string INTERACTIVE_MODE = "interactive";
 const std::string BATCH_MODE = "batch";
 
-const int N_ARGS = 3;
 const int INTERACTIVE_ARGCOUNT = 2;
 const int BATCH_ARGCOUNT = 3;
 const char COMMENT_CHARACTER = '#';
@@ -43,6 +42,7 @@ enum SHAPES
   TRIANGLE,
   UNKNOWNSHAPE
 };
+
 enum COLORS
 {
   RED,
@@ -75,11 +75,24 @@ static const std::vector<std::string> COLORSTRINGS =
         "onbekend"};
 
 // Shape converters
+
+/**
+ * @brief Convert a shape to the string representation
+ * 
+ * @param aShape the shape
+ * @return std::string the string representation
+ */
 inline std::string ShapeToString(SHAPES aShape)
 {
   return SHAPESTRINGS[aShape];
 }
 
+/**
+ * @brief Convert a string representation of a shape to a shape
+ * 
+ * @param aShapeString a string representation of a shape
+ * @return SHAPES the shape
+ */
 inline SHAPES StringToShape(const std::string &aShapeString)
 {
   SHAPES result = SHAPES::UNKNOWNSHAPE;
@@ -101,11 +114,24 @@ inline SHAPES StringToShape(const std::string &aShapeString)
 }
 
 // Color converters
+
+/**
+ * @brief Convert a color to the string representation
+ * 
+ * @param aColor the color to convert
+ * @return std::string the string representation
+ */
 inline std::string ColorToString(COLORS aColor)
 {
   return COLORSTRINGS[aColor];
 }
 
+/**
+ * @brief convert a string representation of a color to a color
+ * 
+ * @param aColorString the string representation
+ * @return COLORS the color
+ */
 inline COLORS StringToColor(const std::string &aColorString)
 {
   COLORS result = COLORS::UNKNOWNCOLOR;
@@ -165,20 +191,66 @@ public:
   Shapedetector(std::string aImageFilePath);
   ~Shapedetector();
 
+  /**
+   * @brief Reset the images to the new captured image
+   */
   void reset();
+  /**
+   * @brief Draw the data on the result image
+   */
   void draw();
+  /**
+   * @brief Recognize the requested shape
+   * 
+   */
   void recognize();
 
+  /**
+   * @brief Function for handling the webcam mode
+   * @param deviceId The webcam device Id
+   */
   void webcamMode(int deviceId);
+  /**
+   * @brief Function for handling the batch mode
+   * @param cameraId The camera device id
+   * @param batchPath The path to the batch file to use
+   */
   void batchMode(int cameraId, std::string batchPath);
 
+  /**
+   * @brief Set the image to use for recognicion
+   * @param aImage the image to set
+   */
   void setImage(Mat aImage);
+
+  /**
+   * @brief Shows the images
+   * @return true The exit key was pressed
+   * @return false The exit key was not pressed
+   */
   bool showImages();
+  /**
+   * @brief Parses the current specification
+   * @param aShapeCommand The command to parse
+   * @return true The parsing was sucessfull
+   * @return false the parsing failed
+   */
   bool parseSpec(const std::string &aShapeCommand);
+  
+  /**
+   * @brief Open the camera to make it ready for capturing
+   * @param cameraId The id of the camera
+   */
   void initCamera(int cameraId);
 
+  /**
+   * @brief Handles the real-time detection algorithm
+   */
   void detectRealtime();
 
+  /**
+   * @brief The capture object for handling the webcam
+   */
   VideoCapture mVidCap;
 
   /**

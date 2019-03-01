@@ -172,7 +172,6 @@ void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
   Point compareCenter;
   for (size_t i = 0; i < aContours.size(); i++)
   {
-    //Calculate center
     currentCenter = getContourCenter(aContours.at(i));
     //Remove duplicates
     for (size_t j = 0; j < aContours.size(); j++)
