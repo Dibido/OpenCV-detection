@@ -41,6 +41,7 @@ Mat Shapedetector::detectColor(COLORS aColor, Mat aImage)
     }
     case COLORS::UNKNOWNCOLOR:
     {
+      inRange(aImage, mBlackLimits[0], mBlackLimits[1], resultMask);
       std::cout << "Error: unknown color = " << aColor << std::endl;
       break;
     }

@@ -155,6 +155,7 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
         std::cout << "Error: invalid specification entered" << std::endl;
     }
 
+    reset();
     draw(); // draw windows and sliders (once)
 
     while (true)
@@ -253,7 +254,6 @@ void Shapedetector::recognize()
 
     mMinSquareRatio = mMinRatioSliderValue / 100.0;
     mMaxSquareRatio = mMaxRatioSliderValue / 100.0;
-    std::cout << "\t RATIO = " << mMinSquareRatio << ", " << mMaxSquareRatio << std::endl;
 
     //////////////////////
     // Apply filters
@@ -317,7 +317,6 @@ Mat Shapedetector::removeNoise(Mat aImage)
 {
     Mat result;
     Mat structure = getStructuringElement(MORPH_RECT, Size(mNoiseSliderValue, mNoiseSliderValue));
-    // Mat structure = getStructuringElement(MORPH_RECT, Size(3, 3));
     morphologyEx(aImage, result, MORPH_OPEN, structure);
     return result;
 }
