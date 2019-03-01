@@ -53,29 +53,9 @@ void Shapedetector::detectTriangles(std::vector<Mat> aContours)
     {
       if (contourSizeAllowed(mCurrentContours.at(i)))
       {
-<<<<<<< HEAD
-        if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
-        {
-          //Ignore small or huge shapes
-        }
-        else
-        {
-          //Check if it is a square
-          std::vector<Point> rectPoints;
-          Rect boundedRect = boundingRect(mCurrentContours.at(i));
-          float ratio = (float)boundedRect.width / (float)boundedRect.height;
-          if (ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
-          {
-            mCurrentShapeCount++;
-            drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-            setShapeValues(mDisplayImage, mCurrentContours.at(i));
-          }
-        }
-=======
         mCurrentShapeCount++;
         drawShapeContours(mDisplayImage, mCurrentContours.at(i));
         setShapeValues(mDisplayImage, mCurrentContours.at(i));
->>>>>>> 2ad90f37836ccef1d72d889a178004fbf4376512
       }
     }
   }
