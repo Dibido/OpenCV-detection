@@ -209,11 +209,16 @@ private:
   int mBlurSliderValue;
   int mContrastSliderValue;
   int mNoiseSliderValue;
+  int mMinRatioSliderValue;
+  int mMaxRatioSliderValue;
 
   // Slider ranges
   int mBlurSliderRange;
   int mContrastSliderRange;
   int mNoiseSliderRange;
+
+  int mMinRatioSliderRange;
+  int mMaxRatioSliderRange;
 
   // Current command values
   COLORS mCurrentColor;
@@ -302,7 +307,7 @@ private:
    * @param aContours the contours in the image
    */
   void detectRectangles(std::vector<Mat> aContours);
-  
+
   /**
    * @brief finds the triangles in an image
    * @param aContours the contours in the image

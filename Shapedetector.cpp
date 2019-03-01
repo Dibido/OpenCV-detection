@@ -46,14 +46,19 @@ void Shapedetector::reset()
 void Shapedetector::initializeValues()
 {
     // Set the calibration variables
-    mBlurSliderValue = 1;
-    mContrastSliderValue = 1;
+    mContrastSliderValue = 0;
+    mBlurSliderValue = 0;
     mNoiseSliderValue = 0;
+    mMinRatioSliderValue = 85;
+    mMaxRatioSliderValue = 108;
 
-    mBlurSliderRange = 11;
-    mContrastSliderRange = 80;
-    mNoiseSliderRange = 10;
+    mContrastSliderRange = 200;
+    mBlurSliderRange = 31; // must be an odd value
+    mNoiseSliderRange = 50;
+    mMinRatioSliderRange = 80;
+    mMaxRatioSliderRange = 150;
 
+    // Window size
     mScreenDrawWidth = 600;
     mScreenDrawHeight = mScreenDrawWidth * 1080 / 1920;
 
@@ -64,6 +69,7 @@ void Shapedetector::initializeValues()
     mMinTreshold = 120;
     mMaxTreshold = 255;
     mTresholdType = ThresholdTypes::THRESH_BINARY;
+
     mMinSquareRatio = 0.85;
     mMaxSquareRatio = 1.08;
 
@@ -85,20 +91,23 @@ void Shapedetector::initializeValues()
     mTimeYOffset = 20;
 
     // Set the color limits for color detection [0] = Min, [1] = Max
-    mBlueLimits[0] = Scalar(95, 55, 20);
-    mBlueLimits[1] = Scalar(135, 255, 255);
-    // mGreenLimits[0] = Scalar(40, 20, 20);
-    // mGreenLimits[1] = Scalar(90, 255, 255);
-    mGreenLimits[0] = Scalar(25, 45, 24);
-    mGreenLimits[1] = Scalar(90, 255, 130);
+    mBlueLimits[0] = Scalar(105, 0, 30);
+    mBlueLimits[1] = Scalar(135, 255, 95);
+
+    mGreenLimits[0] = Scalar(0, 0, 10);
+    mGreenLimits[1] = Scalar(102, 255, 70);
+
     mRedLimits[0] = Scalar(0, 60, 60);
     mRedLimits[1] = Scalar(10, 255, 255);
     mRedLimits[2] = Scalar(170, 60, 60);
     mRedLimits[3] = Scalar(180, 255, 255);
+
     mBlackLimits[0] = Scalar(0, 0, 0);
     mBlackLimits[1] = Scalar(255, 100, 100);
+
     mYellowLimits[0] = Scalar(25, 60, 60);
     mYellowLimits[1] = Scalar(45, 255, 255);
+
     mWhiteLimits[0] = Scalar(10, 30, 20); // Is woodcolor instead of white
     mWhiteLimits[1] = Scalar(24, 255, 255);
 }
@@ -133,7 +142,7 @@ bool Shapedetector::parseSpec(const std::string &aShapeCommand)
 
     if (result)
     {
-      mCurrentShapeCommand = aShapeCommand;
+        mCurrentShapeCommand = aShapeCommand;
     }
 
     return result;
@@ -172,9 +181,8 @@ bool Shapedetector::showImages()
     imshow("Color", mMaskImage);
     imshow("Result", mDisplayImage);
 
-    // imshow("Brightness", mBrightenedRgbImage);
-    // imshow("Blur", mBlurredImage);
-    // imshow("Mask", mMaskImage);
+    imshow("Brightness", mBrightenedRgbImage);
+    imshow("Blur", mBlurredImage);
 
     int pressedKey = waitKey(30);
     if (pressedKey == 27) // ESC key
@@ -213,6 +221,8 @@ void Shapedetector::draw()
     createTrackbar("Brightness", "Sliders", &mContrastSliderValue, mContrastSliderRange, onChange, this);
     createTrackbar("Blur\t\t", "Sliders", &mBlurSliderValue, mBlurSliderRange, onChange, this);
     createTrackbar("Noise\t\t", "Sliders", &mNoiseSliderValue, mNoiseSliderRange, onChange, this);
+    createTrackbar("minRatio\t\t", "Sliders", &mMinRatioSliderValue, mMinRatioSliderRange, onChange, this);
+    createTrackbar("maxRatio\t\t", "Sliders", &mMaxRatioSliderValue, mMaxRatioSliderRange, onChange, this);
     moveWindow("Sliders", 0, mOriginalImage.rows + 10);
 
     const int sliderWidth = 500;
@@ -242,6 +252,10 @@ void Shapedetector::recognize()
     {
         mBlurSliderValue++;
     }
+
+    mMinSquareRatio = mMinRatioSliderValue / 100.0;
+    mMaxSquareRatio = mMaxRatioSliderValue / 100.0;
+    std::cout << "\t RATIO = " << mMinSquareRatio << ", " << mMaxSquareRatio << std::endl;
 
     //////////////////////
     // Apply filters
@@ -397,6 +411,8 @@ void Shapedetector::detectRealtime()
         Mat retrievedFrame;
         mVidCap.grab();
         mVidCap.retrieve(retrievedFrame);
+
+        imwrite("webcamImg.png", retrievedFrame);
 
         mOriginalImage = retrievedFrame;
         reset();
