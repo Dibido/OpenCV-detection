@@ -385,15 +385,6 @@ private:
    * @brief Print the data from the detection to the console
    */
   void printDetectionData();
-
-  /**
-   * @brief print the time taken to the console
-   */
-  void printTimeValue(std::clock_t aStartTime, std::clock_t aEndTime);
-  /**
-   * @brief print the number of shapes found to the console
-   */
-  void printShapeFound();
 };
 
 #endif
