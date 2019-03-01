@@ -42,7 +42,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
           std::vector<Point> rectPoints;
           Rect boundedRect = boundingRect(mCurrentContours.at(i));
           float ratio = (float)boundedRect.width / (float)boundedRect.height;
-          if(ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
+          if (ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
           {
             mCurrentShapeCount++;
             drawShapeContours(mDisplayImage, mCurrentContours.at(i));
@@ -137,13 +137,14 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
 void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
 {
   Point currentCenter;
-  Point compareCenter;;
-  for(size_t i = 0; i < aContours.size(); i++)
+  Point compareCenter;
+  ;
+  for (size_t i = 0; i < aContours.size(); i++)
   {
     //Calculate center
     currentCenter = getContourCenter(aContours.at(i));
     //Remove duplicates
-    for(size_t j = 0; j < aContours.size(); j++)
+    for (size_t j = 0; j < aContours.size(); j++)
     {
       if (j != i) // Not the same shape
       {
@@ -173,7 +174,7 @@ void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
   putText(aImage, areaString, Point(currentCenter.x, currentCenter.y + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
 
   // Print to stdout
-  // std::cout << "\tShape location:\t" << xPosString << "\t" << yPosString << "\t" << areaString << std::endl;
+  std::cout << "\tShape location:\t" << xPosString << "\t" << yPosString << "\t" << areaString << std::endl;
 }
 
 void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)

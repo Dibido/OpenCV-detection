@@ -174,7 +174,7 @@ public:
   void batchMode(int cameraId, std::string batchPath);
 
   void setImage(Mat aImage);
-  bool showImages(VideoCapture cap);
+  bool showImages();
   bool parseSpec(const std::string &aShapeCommand);
   void initCamera(int cameraId);
 

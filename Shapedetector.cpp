@@ -34,6 +34,15 @@ void Shapedetector::setImage(Mat aImage)
     initializeValues();
 }
 
+void Shapedetector::reset()
+{
+    // Reload frames
+    mOriginalImage.copyTo(mDisplayImage);
+    mOriginalImage.copyTo(mTresholdImage);
+    cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
+    mCurrentShapeCount = 0; // Reset shape count
+}
+
 void Shapedetector::initializeValues()
 {
     // Set the calibration variables
@@ -45,7 +54,7 @@ void Shapedetector::initializeValues()
     mContrastSliderRange = 80;
     mNoiseSliderRange = 10;
 
-    mScreenDrawWidth = 500;
+    mScreenDrawWidth = 600;
     mScreenDrawHeight = mScreenDrawWidth * 1080 / 1920;
 
     // Set the blur variables
@@ -134,7 +143,7 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 
     while (true)
     {
-        bool keyPressed = showImages(mVidCap);
+        bool keyPressed = showImages();
         if (keyPressed)
         {
             break;
@@ -142,45 +151,13 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
     }
 }
 
-// void batch()
-// {
-//     bool parsingSucceeded = parseSpec(aShapeCommand);
-//     if (parsingSucceeded == false)
-//     {
-//         std::cout << "Error: invalid specification entered" << std::endl;
-//     }
-//     reset();              // reset images and values
-//     recognize();          // run algorithm
-//     printDetectionData(); // Print data
-// }
-
-// void regular()
-// {
-//     bool parsingSucceeded = parseSpec(aShapeCommand);
-//     if (parsingSucceeded == false)
-//     {
-//         std::cout << "Error: invalid specification entered" << std::endl;
-//     }
-
-//     draw(); // draw windows and sliders (once)
-
-//     while (true)
-//     {
-//         bool keyPressed = showImages(mVidCap);
-//         if (keyPressed)
-//         {
-//             break;
-//         }
-//     }
-// }
-
-bool Shapedetector::showImages(VideoCapture cap)
+bool Shapedetector::showImages()
 {
     bool keyPressed = false;
 
     // Get new frame
-    cap.grab();
-    cap.retrieve(mOriginalImage);
+    mVidCap.grab();
+    mVidCap.retrieve(mOriginalImage);
 
     reset();     // reset images and values
     recognize(); // run algorithm
@@ -192,7 +169,7 @@ bool Shapedetector::showImages(VideoCapture cap)
 
     // imshow("Brightness", mBrightenedRgbImage);
     // imshow("Blur", mBlurredImage);
-    imshow("Mask", mMaskImage);
+    // imshow("Mask", mMaskImage);
 
     imshow("Result", mDisplayImage);
 
@@ -204,15 +181,6 @@ bool Shapedetector::showImages(VideoCapture cap)
     }
 
     return keyPressed;
-}
-
-void Shapedetector::reset()
-{
-    // Reload frames
-    mOriginalImage.copyTo(mDisplayImage);
-    mOriginalImage.copyTo(mTresholdImage);
-    cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
-    mCurrentShapeCount = 0; // Reset shape count
 }
 
 // Draws the windows and text
@@ -243,9 +211,13 @@ void Shapedetector::draw()
     // Sliders
     namedWindow("Sliders");
     createTrackbar("Brightness", "Sliders", &mContrastSliderValue, mContrastSliderRange, onChange, this);
-    createTrackbar("Blur", "Sliders", &mBlurSliderValue, mBlurSliderRange, onChange, this);
-    createTrackbar("Noise", "Sliders", &mNoiseSliderValue, mNoiseSliderRange, onChange, this);
-    moveWindow("Sliders", 0, mOriginalImage.rows + 20);
+    createTrackbar("Blur\t\t", "Sliders", &mBlurSliderValue, mBlurSliderRange, onChange, this);
+    createTrackbar("Noise\t\t", "Sliders", &mNoiseSliderValue, mNoiseSliderRange, onChange, this);
+    moveWindow("Sliders", 0, mOriginalImage.rows + 10);
+
+    const int sliderWidth = 500;
+    Mat emptyMatrix = Mat::zeros(1, sliderWidth, CV_8U);
+    imshow("Sliders", emptyMatrix); // put an empty matrix in this window to prevent errors
 }
 
 void Shapedetector::printDetectionData()
@@ -444,15 +416,21 @@ void Shapedetector::batchMode(int cameraId, std::string batchPath)
                     std::cout << "Error: invalid specification entered" << std::endl;
                 }
 
-
                 Mat retrievedFrame;
                 mVidCap.grab();
                 mVidCap.retrieve(retrievedFrame);
                 setImage(retrievedFrame);
 
-                reset(); // reset images and values
-                recognize();          // run algorithm
-                printDetectionData(); // Print data
+                draw();
+
+                while (true)
+                {
+                    bool keyPressed = showImages();
+                    if (keyPressed)
+                    {
+                        break;
+                    }
+                }
             }
         }
     }
@@ -467,19 +445,3 @@ void Shapedetector::initCamera(int cameraId)
         std::cout << "Error: video capture not opened" << std::endl;
     }
 }
-
-// void Shapedetector::batchMode()
-// {
-//     getline();
-
-//     while (true)
-//     {
-//         recognize();
-//         imshow();
-
-//         if (ESC)
-//         {
-//             break;
-//         }
-//     }
-// }
