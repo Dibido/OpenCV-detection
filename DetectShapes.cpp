@@ -205,7 +205,7 @@ void Shapedetector::setShapeValues(Mat aImage, Mat aContour)
   putText(aImage, areaString, Point(currentCenter.x, currentCenter.y + (mTextOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(255, 255, 255), 1);
 
   // Print to stdout
-  // std::cout << "\tShape location:\t" << xPosString << "\t" << yPosString << "\t" << areaString << std::endl;
+  std::cout << "\tShape location:\t" << xPosString << "\t" << yPosString << "\t" << areaString << std::endl;
 }
 
 void Shapedetector::drawShapeContours(Mat aImage, Mat aContour)

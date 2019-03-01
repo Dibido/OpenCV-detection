@@ -184,9 +184,6 @@ bool Shapedetector::showImages()
 // Draws the windows and text
 void Shapedetector::draw()
 {
-    setTimeValue(mDisplayImage, mClockStart, mClockEnd); // draw durations
-    setShapeFound(mDisplayImage);                        // draw found shapes
-
     // Show original
     namedWindow("Original", WINDOW_NORMAL);
     moveWindow("Original", 0, 0);
@@ -220,27 +217,8 @@ void Shapedetector::draw()
 
 void Shapedetector::printDetectionData()
 {
-    printTimeValue(mClockStart, mClockEnd);
-    printShapeFound();
-
-    // int time = 0;
-    // std::string nShapes = std::to_string(mCurrentShapeCount);
-    // std::string shape = ShapeToString(mCurrentShape);
-
-    // std::cout << "T = " << time << "\t";
-    // std::cout << "\"" << shape << "\" count = " << nShapes << "\t";
-    // std::cout << "T = " << time << "\t";
-}
-
-void Shapedetector::printTimeValue(std::clock_t aStartTime, std::clock_t aEndTime)
-{
-    std::cout << std::fixed << std::setprecision(2) << "\tCPU time used:\t" << 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC << " ms" << std::endl;
-}
-
-void Shapedetector::printShapeFound()
-{
-    const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
-    std::cout << "\tShapes found:\t" << shapeCountText << std::endl;
+    std::cout << std::fixed << std::setprecision(2) << "\tT = " << 1000.0 * ((double)mClockEnd - (double)mClockStart) / CLOCKS_PER_SEC << " ms\t\t";
+    std::cout << std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape) << std::endl;
 }
 
 // Starts the detection algorithm
@@ -286,9 +264,12 @@ void Shapedetector::recognize()
     //////////////////
     // Detect shapes
     //////////////////
-
     detectShape(mCurrentShape, removedNoise);
     mClockEnd = std::clock(); // Stop timer
+
+    // Show recognition data in displayed image
+    setTimeValue(mDisplayImage, mClockStart, mClockEnd);
+    setShapeFound(mDisplayImage);
 }
 
 void Shapedetector::onChange(int, void *)
@@ -298,13 +279,11 @@ void Shapedetector::onChange(int, void *)
 void Shapedetector::setShapeFound(Mat aImage)
 {
     const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
-    printShapeFound();
     putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
 {
-    printTimeValue(aStartTime, aEndTime);
     double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
     const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
     putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
@@ -433,6 +412,17 @@ void Shapedetector::batchMode(int cameraId, std::string batchPath)
 
                 while (true)
                 {
+                    Mat retrievedFrame;
+                    mVidCap.grab();
+                    mVidCap.retrieve(retrievedFrame);
+
+                    mOriginalImage = retrievedFrame;
+                    reset();
+
+                    recognize();
+
+                    printDetectionData();
+
                     bool keyPressed = showImages();
                     if (keyPressed)
                     {

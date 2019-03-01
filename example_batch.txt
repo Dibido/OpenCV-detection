@@ -1,5 +1,11 @@
 # Ignored comment
 vierkant rood
-cirkel blauw
+# cirkel blauw
+# vierkant groen
+# driehoek rood
 vierkant groen
-driehoek rood
+rechthoek groen
+vierkant blauw
+halfcirkel geel
+cirkel geel
+rechthoek geel
