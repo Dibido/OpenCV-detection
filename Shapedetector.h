@@ -169,7 +169,6 @@ public:
   void draw();
   void recognize();
 
-  void startCommandline(std::string imgPath);
   void webcamMode(int deviceId);
   void batchMode(int cameraId, std::string batchPath);
 
@@ -177,6 +176,8 @@ public:
   bool showImages();
   bool parseSpec(const std::string &aShapeCommand);
   void initCamera(int cameraId);
+
+  void detectRealtime();
 
   VideoCapture mVidCap;
 

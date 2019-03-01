@@ -34,12 +34,7 @@ int main(int argc, char **argv)
         std::string imgPath = argv[1];
         Shapedetector shapeDetector; // create shape detector
 
-        if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
-        {
-            std::cout << "### cmdLine ###" << std::endl;
-            shapeDetector.startCommandline(imgPath);
-        }
-        else if (argc == INTERACTIVE_ARGCOUNT)
+        if (argc == INTERACTIVE_ARGCOUNT)
         {
             std::cout << "### webcam ###" << std::endl;
             shapeDetector.webcamMode(atoi(argv[1]));
