@@ -1,135 +1,144 @@
 #include "Shapedetector.h"
 
-std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
+void Shapedetector::detectSquares(std::vector<Mat> aContours)
 {
-  findContours(aShapeMask, mCurrentContours, CV_RETR_EXTERNAL, CHAIN_APPROX_NONE);
-  switch (aShape)
+  for (size_t i = 0; i < aContours.size(); i++)
   {
-  case SHAPES::ALL_SHAPES:
-  {
-    for (size_t i = 0; i < mCurrentContours.size(); i++)
+    double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
+    approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+    if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
     {
-      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
-      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
+      if (contourSizeAllowed(mCurrentContours.at(i)))
       {
-        //Ignore small or huge shapes
+        //Check if it is a square
+        std::vector<Point> rectPoints;
+        Rect boundedRect = boundingRect(mCurrentContours.at(i));
+        float ratio = (float)boundedRect.width / (float)boundedRect.height;
+        if(ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
+        {
+          mCurrentShapeCount++;
+          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        }
       }
-      else
+    }
+  }
+}
+
+void Shapedetector::detectRectangles(std::vector<Mat> aContours)
+{
+  for (size_t i = 0; i < aContours.size(); i++)
+  {
+    double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
+    approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+    if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
+    {
+      if (contourSizeAllowed(mCurrentContours.at(i)))
       {
         mCurrentShapeCount++;
         drawShapeContours(mDisplayImage, mCurrentContours.at(i));
         setShapeValues(mDisplayImage, mCurrentContours.at(i));
       }
     }
-    break;
   }
-  case SHAPES::SQUARE:
-  {
-    for (size_t i = 0; i < mCurrentContours.size(); i++)
-    {
-      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
-      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
-      {
-        if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
-        {
-          //Ignore small or huge shapes
-        }
-        else
-        {
-          //Check if it is a square
-          std::vector<Point> rectPoints;
-          Rect boundedRect = boundingRect(mCurrentContours.at(i));
-          float ratio = (float)boundedRect.width / (float)boundedRect.height;
-          if(ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
-          {
-            mCurrentShapeCount++;
-            drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-            setShapeValues(mDisplayImage, mCurrentContours.at(i));
-          }
-        }
-      }
-    }
-    break;
-  }
-  case SHAPES::RECTANGLE:
-  {
-    for (size_t i = 0; i < mCurrentContours.size(); i++)
-    {
-      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
-      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height == SQUARE_CORNERCOUNT)
-      {
-        if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
-        {
-          //Ignore small or huge shapes
-        }
-        else
-        {
-          mCurrentShapeCount++;
-          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-          setShapeValues(mDisplayImage, mCurrentContours.at(i));
-        }
-      }
-    }
-    break;
-  }
-  case SHAPES::TRIANGLE:
-  {
-    for (size_t i = 0; i < mCurrentContours.size(); i++)
-    {
-      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
-      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height == TRIANGLE_CORNERCOUNT)
-      {
-        if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
-        {
-          //Ignore small or huge shapes
-        }
-        else
-        {
-          mCurrentShapeCount++;
-          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-          setShapeValues(mDisplayImage, mCurrentContours.at(i));
-        }
-      }
-    }
-    break;
-  }
-  case SHAPES::CIRCLE:
-  {
-    for (size_t i = 0; i < mCurrentContours.size(); i++)
-    {
-      double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
-      approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
-      if (mApproxImage.size().height > 5)
-      {
-        if (contourArea(mCurrentContours.at(i)) < mMinContourSize || contourArea(mCurrentContours.at(i)) > mMaxContourSize)
-        {
-          //Ignore small or huge shapes
-        }
-        else
-        {
-          mCurrentShapeCount++;
-          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
-          setShapeValues(mDisplayImage, mCurrentContours.at(i));
-        }
-      }
-    }
-    break;
-  }
-  case SHAPES::HALFCIRCLE:
-  {
-    // TODO: find half circles
+}
 
-    break;
-  }
-  case SHAPES::UNKNOWNSHAPE:
+void Shapedetector::detectTriangles(std::vector<Mat> aContours)
+{
+  for (size_t i = 0; i < aContours.size(); i++)
   {
-    std::cout << "ERROR - Unknown shape" << std::endl;
-    break;
+    double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
+    approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+    if (mApproxImage.size().height == TRIANGLE_CORNERCOUNT)
+    {
+      if (contourSizeAllowed(mCurrentContours.at(i)))
+      {
+        mCurrentShapeCount++;
+        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+        setShapeValues(mDisplayImage, mCurrentContours.at(i));
+      }
+    }
   }
+}
+
+void Shapedetector::detectCircles(std::vector<Mat> aContours)
+{
+  for (size_t i = 0; i < aContours.size(); i++)
+  {
+    double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
+    approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+    if (mApproxImage.size().height > 5)
+    {
+      if (contourSizeAllowed(mCurrentContours.at(i)))
+      {
+        mCurrentShapeCount++;
+        drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+        setShapeValues(mDisplayImage, mCurrentContours.at(i));
+      }
+    }
+  }
+}
+
+void Shapedetector::detectHalfCircles(std::vector<Mat> aContours)
+{
+  //TODO: detect halfcircles
+}
+
+bool Shapedetector::contourSizeAllowed(Mat aContour)
+{
+  return (contourArea(aContour) > mMinContourSize && contourArea(aContour) < mMaxContourSize);
+}
+
+std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
+{
+  findContours(aShapeMask, mCurrentContours, CV_RETR_EXTERNAL, CHAIN_APPROX_NONE);
+  switch (aShape)
+  {
+    case SHAPES::ALL_SHAPES:
+    {
+      for (size_t i = 0; i < mCurrentContours.size(); i++)
+      {
+        double epsilon = mEpsilonMultiply * arcLength(mCurrentContours.at(i), true);
+        approxPolyDP(mCurrentContours.at(i), mApproxImage, epsilon, true);
+        if(contourSizeAllowed(mCurrentContours.at(i)))
+        {
+          mCurrentShapeCount++;
+          drawShapeContours(mDisplayImage, mCurrentContours.at(i));
+          setShapeValues(mDisplayImage, mCurrentContours.at(i));
+        }
+      }
+      break;
+    }
+    case SHAPES::SQUARE:
+    {
+      detectSquares(mCurrentContours);
+      break;
+    }
+    case SHAPES::RECTANGLE:
+    {
+      detectRectangles(mCurrentContours);
+      break;
+    }
+    case SHAPES::TRIANGLE:
+    {
+      detectTriangles(mCurrentContours);
+      break;
+    }
+    case SHAPES::CIRCLE:
+    {
+      detectCircles(mCurrentContours); 
+      break;
+    }
+    case SHAPES::HALFCIRCLE:
+    {
+      detectHalfCircles(mCurrentContours);
+      break;
+    }
+    case SHAPES::UNKNOWNSHAPE:
+    {
+      std::cout << "ERROR - Unknown shape" << std::endl;
+      break;
+    }
   }
   return mCurrentContours;
 }

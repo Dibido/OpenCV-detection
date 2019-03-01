@@ -266,6 +266,43 @@ private:
   std::vector<Mat> detectShape(SHAPES aShape, Mat aShapeMask);
 
   /**
+   * @brief finds the squares in an image
+   * @param aContours the contours in the image
+   */
+  void detectSquares(std::vector<Mat> aContours);
+
+  /**
+   * @brief finds the rectangles in an image
+   * @param aContours the contours in the image
+   */
+  void detectRectangles(std::vector<Mat> aContours);
+  
+  /**
+   * @brief finds the triangles in an image
+   * @param aContours the contours in the image
+   */
+  void detectTriangles(std::vector<Mat> aContours);
+
+  /**
+   * @brief finds the circles in an image
+   * @param aContours the contours in the image
+   */
+  void detectCircles(std::vector<Mat> aContours);
+
+  /**
+   * @brief Checks whether the contour is within the min and max contourSize
+   * @param aContour the contour to check
+   * @return whether the contour is within the range
+   */
+  bool contourSizeAllowed(Mat aContour);
+
+  /**
+   * @brief finds the halfcircles in an image
+   * @param aContours the contours in the image
+   */
+  void detectHalfCircles(std::vector<Mat> aContours);
+
+  /**
      * @brief Set the X/Y/Area in the center of the shape
      * @param aImage The image to set the values on
      * @param aContour The contour to place the values in

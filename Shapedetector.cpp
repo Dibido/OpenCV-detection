@@ -83,7 +83,7 @@ void Shapedetector::initializeValues()
     mYellowLimits[0] = Scalar(25, 60, 60);
     mYellowLimits[1] = Scalar(45, 255, 255);
     mWhiteLimits[0] = Scalar(15, 40, 30); // Is woodcolor instead of white
-    mWhiteLimits[1] = Scalar(25, 255, 255);
+    mWhiteLimits[1] = Scalar(20, 255, 255);
 }
 
 // Destructor
