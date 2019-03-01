@@ -4,20 +4,7 @@
 // Constructor
 Shapedetector::Shapedetector()
 {
-}
-
-Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFilePath)
-{
-    // Store origininal image
-    mOriginalImage = imread(mImagePath);
-    mOriginalImage.copyTo(mDisplayImage);
-    mOriginalImage.copyTo(mTresholdImage);
-
-    // Convert to necessary formats
-    cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
-    cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
-
-    initializeValues();
+  initializeValues();
 }
 
 void Shapedetector::setImage(Mat aImage)
@@ -193,7 +180,6 @@ bool Shapedetector::showImages()
     return keyPressed;
 }
 
-// Draws the windows and text
 void Shapedetector::draw()
 {
     // Show original
@@ -210,10 +196,6 @@ void Shapedetector::draw()
     namedWindow("Result", WINDOW_NORMAL);
     moveWindow("Result", mScreenDrawWidth * 2, 0);
     resizeWindow("Result", mScreenDrawWidth, mScreenDrawHeight);
-
-    // resizeWindow("Brightness", mScreenDrawWidth, mScreenDrawHeight);
-    // resizeWindow("Blur", mScreenDrawWidth, mScreenDrawHeight);
-    // resizeWindow("Color", mScreenDrawWidth, mScreenDrawHeight);
 
     // Sliders
     namedWindow("Sliders");
@@ -238,8 +220,6 @@ void Shapedetector::printDetectionData()
 // Starts the detection algorithm
 void Shapedetector::recognize()
 {
-    mClockStart = std::clock(); // Start timer
-
     ////////////////////////////////////////
     // Constrain/manipulate slider values
     ////////////////////////////////////////
@@ -254,6 +234,8 @@ void Shapedetector::recognize()
 
     mMinSquareRatio = mMinRatioSliderValue / 100.0;
     mMaxSquareRatio = mMaxRatioSliderValue / 100.0;
+
+    mClockStart = std::clock(); // Start timer
 
     //////////////////////
     // Apply filters
@@ -278,10 +260,9 @@ void Shapedetector::recognize()
     // 4. Remove noise
     Mat removedNoise = removeNoise(mMaskImage);
 
-    //////////////////
-    // Detect shapes
-    //////////////////
+    // 5. Detect shapes
     detectShape(mCurrentShape, removedNoise);
+
     mClockEnd = std::clock(); // Stop timer
 
     // Show recognition data in displayed image
@@ -329,8 +310,6 @@ void Shapedetector::webcamMode(int deviceId)
     std::cout << "### Webcam mode ###" << std::endl;
     std::cout << "Please enter [vorm] [kleur]" << std::endl;
 
-    // setImage(capturedImage); // create shape detector
-
     while (true)
     {
         std::cout << "> ";
@@ -339,8 +318,6 @@ void Shapedetector::webcamMode(int deviceId)
 
         if (command != EXIT_COMMAND)
         {
-            // handleShapeCommand(command); // Start algorithm
-
             bool parsingSucceeded = parseSpec(command);
             if (parsingSucceeded == false)
             {
@@ -408,9 +385,6 @@ void Shapedetector::detectRealtime()
         Mat retrievedFrame;
         mVidCap.grab();
         mVidCap.retrieve(retrievedFrame);
-
-        imwrite("webcamImg.png", retrievedFrame);
-
         mOriginalImage = retrievedFrame;
         reset();
         recognize();
@@ -431,5 +405,6 @@ void Shapedetector::initCamera(int cameraId)
     if (mVidCap.isOpened() == false)
     {
         std::cout << "Error: video capture not opened" << std::endl;
+        exit(-1);
     }
 }

@@ -17,21 +17,6 @@ Mat Foo(const Mat& aMat)
 }
 ```
 
-## Tasks
-
-|Task|
-|----|
-|Batch mode implementeren|
-|Per lijn afhandelen|
-|Comments negeren|
-|Calibratie|
-|Kleuren|
-|Vormen|
-|Cirkel herkennen|
-|Halve cirkel herkennen|
-|Meer filters maken|
-
-
 ## Compilation instructions
 This program has been created using CMake. Use the following commands to compile:  
 ``` Bash
@@ -40,14 +25,19 @@ cd build
 cmake ..
 make
 ```
+And to run in the different modes:
+``` Bash
+./shapedetector 1 #Webcam mode
+./shapedetector 1 ../example_batch.txt #Batch mode
+```
 ## Arguments
 Batch:  
 ``` Bash
-shapedetector [image] [batchfile]
+shapedetector [cameraId] [batchfile]
 ```
 Interactive:  
 ``` Bash
-shapedetector [image]
+shapedetector [cameraId]
 ```
 ## Commands
 ### Syntax
@@ -56,7 +46,7 @@ shapedetector [image]
 ```
 ### Examples
 ``` Bash
-circle red\n
+cirkel rood\n
 ```
 ### Comments
 ``` Bash
@@ -67,15 +57,15 @@ circle red\n
 ### Interactive mode
 * Show contours of the form
 * X/Y points of the center of the form
-* Area of the form
+* Area of the form in pixels
 * Time in cycles to find the result (std::clock)
-* Whether any shapes were detected
+* Whether any shapes were detected (the number of found objects)
 ### Batch mode
 * Data from interactive mode to STDOUT
 ## Compilation requirements
 * Using the C++-14 standard.
 * Compiled with -Wall -Wextra -Wconversion without errors.
 * The compiler should show *All* output.
-* Codecheckers (Codan / cppcheck) should not show any errors.
-* Valgrind should not show any errors when run with all levels turned on.
+* Codecheckers (Codan / cppcheck) should not show any warnings.
+* Valgrind should be able to run flawlessly when run with all levels turned on.
 * Headerfiles contain the necessary Doxygen comments.

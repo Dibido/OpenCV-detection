@@ -188,7 +188,6 @@ class Shapedetector
 {
 public:
   Shapedetector();
-  Shapedetector(std::string aImageFilePath);
   ~Shapedetector();
 
   /**

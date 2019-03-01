@@ -31,17 +31,14 @@ int main(int argc, char **argv)
 
     if (argc > 1)
     {
-        std::string imgPath = argv[1];
         Shapedetector shapeDetector; // create shape detector
 
         if (argc == INTERACTIVE_ARGCOUNT)
         {
-            std::cout << "### webcam ###" << std::endl;
             shapeDetector.webcamMode(atoi(argv[1]));
         }
         else if (argc == BATCH_ARGCOUNT) // shapedetector [image] [batchfile]
         {
-            std::cout << "### batch ###" << std::endl;
             shapeDetector.batchMode(atoi(argv[1]), argv[2]);
         }
     }
@@ -49,8 +46,7 @@ int main(int argc, char **argv)
     {
         std::cout << "Error: invalid arguments or filepath, usage:" << std::endl;
         std::cout << "\tWebcam mode:\t\tshapedetector [device id]" << std::endl;
-        std::cout << "\tInteractive mode:\tshapedetector [image]" << std::endl;
-        std::cout << "\tBatch mode:\t\tshapedetector [image] [batchfile]" << std::endl;
+        std::cout << "\tBatch mode:\t\tshapedetector [device id] [batchfile]" << std::endl;
     }
 
     return 0;
