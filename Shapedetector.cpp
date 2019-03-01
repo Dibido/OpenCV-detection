@@ -2,7 +2,12 @@
 #include "Shapedetector.h"
 
 // Constructor
-Shapedetector::Shapedetector(std::string aImageFilePath, bool isBatchMode) : mImagePath(aImageFilePath), mBatchMode(isBatchMode)
+Shapedetector::Shapedetector()
+{
+    initializeValues();
+}
+
+Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFilePath)
 {
     // Store origininal image
     mOriginalImage = imread(mImagePath);
@@ -16,7 +21,7 @@ Shapedetector::Shapedetector(std::string aImageFilePath, bool isBatchMode) : mIm
     initializeValues();
 }
 
-Shapedetector::Shapedetector(Mat aImage, bool isBatchMode) : mBatchMode(isBatchMode)
+Shapedetector::Shapedetector(Mat aImage)
 {
     // Store origininal image
     mOriginalImage = aImage;
@@ -128,8 +133,11 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
                 imshow("Color", mMaskImage);
                 imshow("Result", mDisplayImage);
 
-                imshow("Brightness", mBrightenedRgbImage);
-                imshow("Blur", mBlurredImage);
+                // imshow("Brightness", mBrightenedRgbImage);
+                // imshow("Blur", mBlurredImage);
+                imshow("Mask", mMaskImage);
+
+                imshow("Result", mDisplayImage);
 
                 int keyPressed = waitKey(30);
                 if (keyPressed == 27) // ESC key
@@ -219,9 +227,9 @@ void Shapedetector::recognize()
     ////////////////////////////////////////
     // Constrain/manipulate slider values
     ////////////////////////////////////////
-    if(mNoiseSliderValue == 0)
+    if (mNoiseSliderValue == 0)
     {
-      mNoiseSliderValue++;           // noiseValue must be > 0
+        mNoiseSliderValue++; // noiseValue must be > 0
     }
     if (mBlurSliderValue % 2 == 0) // blur kernel size must be an odd value
     {
@@ -285,4 +293,108 @@ Mat Shapedetector::removeNoise(Mat aImage)
     // Mat structure = getStructuringElement(MORPH_RECT, Size(3, 3));
     morphologyEx(aImage, result, MORPH_OPEN, structure);
     return result;
+}
+
+void Shapedetector::startCommandline()
+{
+    std::cout << "### Interactive mode ###" << std::endl;
+
+    while (true)
+    {
+        std::cout << "Please enter [vorm] [kleur]" << std::endl;
+        std::cout << "> ";
+        std::string command;
+        getline(std::cin, command); // Get command
+
+        if (command != EXIT_COMMAND)
+        {
+            handleShapeCommand(command); // Start algorithm
+        }
+        else if (command == EXIT_COMMAND)
+        {
+            std::cout << "Closing program.." << std::endl;
+            break;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+void Shapedetector::webcamMode(int deviceId)
+{
+    // Set pretake cam framecount
+    const int WEBCAM_START_IMAGES = 10;
+
+    // Read image from webcam
+    VideoCapture cap;
+    Mat capturedImage;
+    cap.open(deviceId);
+    if (cap.isOpened())
+    {
+        for (size_t i = 0; i < WEBCAM_START_IMAGES; i++)
+        {
+            cap.grab();
+            cap.retrieve(capturedImage);
+        }
+        cap.retrieve(capturedImage);
+        cap.release();
+        imwrite("webcamblocks1.png", capturedImage);
+    }
+
+    // Start webcam mode
+    std::cout << "### Webcam mode ###" << std::endl;
+    std::cout << "Please enter [vorm] [kleur]" << std::endl;
+
+    Shapedetector shapeDetector(capturedImage); // create shape detector
+
+    while (true)
+    {
+        std::cout << "> ";
+        std::string command;
+        getline(std::cin, command); // Get command
+
+        if (command != EXIT_COMMAND)
+        {
+            shapeDetector.handleShapeCommand(command); // Start algorithm
+        }
+        else if (command == EXIT_COMMAND)
+        {
+            std::cout << "Closing program.." << std::endl;
+            break;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
+
+void Shapedetector::batchMode(std::string fileName)
+{
+    mBatchMode = true;
+
+    // Start batchmode
+    std::cout << "### Batch mode ###" << std::endl;
+    if (fileExists(fileName))
+    {
+        std::string line;
+        std::ifstream batchFile(fileName);
+
+        while (std::getline(batchFile, line))
+        {
+            // Ignore comments
+            if (line.at(0) != COMMENT_CHARACTER)
+            {
+                std::cout << line << std::endl;
+                handleShapeCommand(line);
+            }
+        }
+    }
+    else
+    {
+        std::cout << "ERROR - Batchfile does not exist." << std::endl;
+        exit(0);
+    }
 }

@@ -22,6 +22,16 @@ using namespace cv;
 #define SQUARE_CORNERCOUNT 4
 #define TRIANGLE_CORNERCOUNT 3
 
+/// Constants
+const std::string EXIT_COMMAND = "exit";
+const std::string INTERACTIVE_MODE = "interactive";
+const std::string BATCH_MODE = "batch";
+
+const int N_ARGS = 3;
+const int INTERACTIVE_ARGCOUNT = 2;
+const int BATCH_ARGCOUNT = 3;
+const char COMMENT_CHARACTER = '#';
+
 // Enums
 enum SHAPES
 {
@@ -151,13 +161,18 @@ inline bool fileExists(const std::string &aFilePath)
 class Shapedetector
 {
 public:
-  Shapedetector(std::string aImageFilePath, bool batchMode);
-  Shapedetector(Mat aImage, bool batchMode);
+  Shapedetector();
+  Shapedetector(std::string aImageFilePath);
+  Shapedetector(Mat aImage);
   ~Shapedetector();
 
   void reset();
   void draw();
   void recognize();
+
+  void startCommandline();
+  void webcamMode(int deviceId);
+  void batchMode(std::string fileName);
 
   /**
      * @brief Handles a single shape command
