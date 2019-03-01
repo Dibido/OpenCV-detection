@@ -225,13 +225,14 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
 void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
 {
   Point currentCenter;
-  Point compareCenter;;
-  for(size_t i = 0; i < aContours.size(); i++)
+  Point compareCenter;
+  ;
+  for (size_t i = 0; i < aContours.size(); i++)
   {
     //Calculate center
     currentCenter = getContourCenter(aContours.at(i));
     //Remove duplicates
-    for(size_t j = 0; j < aContours.size(); j++)
+    for (size_t j = 0; j < aContours.size(); j++)
     {
       if (j != i) // Not the same shape
       {

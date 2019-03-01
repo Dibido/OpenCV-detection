@@ -163,16 +163,22 @@ class Shapedetector
 public:
   Shapedetector();
   Shapedetector(std::string aImageFilePath);
-  Shapedetector(Mat aImage);
   ~Shapedetector();
 
   void reset();
   void draw();
   void recognize();
 
-  void startCommandline();
+  void startCommandline(std::string imgPath);
   void webcamMode(int deviceId);
-  void batchMode(std::string fileName);
+  void batchMode(int cameraId, std::string batchPath);
+
+  void setImage(Mat aImage);
+  bool showImages();
+  bool parseSpec(const std::string &aShapeCommand);
+  void initCamera(int cameraId);
+
+  VideoCapture mVidCap;
 
   /**
      * @brief Handles a single shape command
@@ -190,7 +196,6 @@ public:
 private:
   // Program variables
   std::string mImagePath;
-  bool mBatchMode;
 
   // Image matrices
   Mat mHSVImage;

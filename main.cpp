@@ -37,17 +37,17 @@ int main(int argc, char **argv)
         if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
         {
             std::cout << "### cmdLine ###" << std::endl;
-            shapeDetector.startCommandline();
+            shapeDetector.startCommandline(imgPath);
         }
         else if (argc == INTERACTIVE_ARGCOUNT)
         {
             std::cout << "### webcam ###" << std::endl;
             shapeDetector.webcamMode(atoi(argv[1]));
         }
-        else if (argc == BATCH_ARGCOUNT && fileExists(imgPath)) // shapedetector [image] [batchfile]
+        else if (argc == BATCH_ARGCOUNT) // shapedetector [image] [batchfile]
         {
             std::cout << "### batch ###" << std::endl;
-            shapeDetector.batchMode(argv[2]);
+            shapeDetector.batchMode(atoi(argv[1]), argv[2]);
         }
     }
     else
