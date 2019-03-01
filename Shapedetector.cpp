@@ -65,6 +65,10 @@ void Shapedetector::initializeValues()
     mEpsilonMultiply = 0.04;
     mMinContourSize = 500.0;
     mMaxContourSize = 30000.0;
+    mMaxHalfCircleInlierPercentage = 60.0;
+    mMinHalfCircleInlierPercentage = 10.0;
+    mMinHalfCirclePercentage = 50.0;
+    mMaxHalfCirclePercentage = 72.0;
     mTextOffset = 20;
     mTextSize = 0.5;
 
@@ -87,8 +91,8 @@ void Shapedetector::initializeValues()
     mBlackLimits[1] = Scalar(255, 100, 100);
     mYellowLimits[0] = Scalar(25, 60, 60);
     mYellowLimits[1] = Scalar(45, 255, 255);
-    mWhiteLimits[0] = Scalar(15, 40, 30); // Is woodcolor instead of white
-    mWhiteLimits[1] = Scalar(20, 255, 255);
+    mWhiteLimits[0] = Scalar(10, 30, 20); // Is woodcolor instead of white
+    mWhiteLimits[1] = Scalar(24, 255, 255);
 }
 
 // Destructor

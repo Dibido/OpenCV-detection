@@ -252,6 +252,10 @@ private:
   double mEpsilonMultiply;
   double mMinContourSize;
   double mMaxContourSize;
+  double mMaxHalfCircleInlierPercentage;
+  double mMinHalfCircleInlierPercentage;
+  double mMinHalfCirclePercentage;
+  double mMaxHalfCirclePercentage;
 
   // Text variables
   int mTextOffset;
@@ -316,6 +320,12 @@ private:
    * @param aContours the contours in the image
    */
   void detectHalfCircles(std::vector<Mat> aContours);
+
+  /**
+   * @brief finds the halfcircles in an image using the houghcircles algorithm
+   * @param aContours the contours in the image
+   */
+  void detectHalfCirclesHough(std::vector<Mat> aContours);
 
   /**
      * @brief Set the X/Y/Area in the center of the shape
