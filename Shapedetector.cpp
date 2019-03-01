@@ -4,7 +4,6 @@
 // Constructor
 Shapedetector::Shapedetector()
 {
-    initializeValues();
 }
 
 Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFilePath)
@@ -21,7 +20,7 @@ Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFile
     initializeValues();
 }
 
-Shapedetector::Shapedetector(Mat aImage)
+void Shapedetector::setImage(Mat aImage)
 {
     // Store origininal image
     mOriginalImage = aImage;
@@ -96,68 +95,115 @@ Shapedetector::~Shapedetector()
 {
 }
 
-// Shape detectors "main"
-void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
+bool Shapedetector::parseSpec(const std::string &aShapeCommand)
 {
+    bool result = true;
+
     // Parse command
     std::size_t delimiterPos = aShapeCommand.find(' ');
     std::string shapeStr = aShapeCommand.substr(0, delimiterPos);
     std::string colorStr = aShapeCommand.substr(delimiterPos + 1);
 
-    // Convert strings
-    mCurrentColor = StringToColor(colorStr);
-    mCurrentShape = StringToShape(shapeStr);
-
-    VideoCapture cap;
-    cap.open(1);
-
-    if (mCurrentColor != COLORS::UNKNOWNCOLOR || mCurrentShape != SHAPES::UNKNOWNSHAPE)
+    mCurrentColor = StringToColor(colorStr); // convert string to enum
+    if (mCurrentColor == COLORS::UNKNOWNCOLOR)
     {
-        if (mBatchMode == false)
+        std::cout << "Error: unkown color entered" << std::endl;
+        result = false;
+    }
+
+    mCurrentShape = StringToShape(shapeStr); // convert string to enum
+    if (mCurrentShape == SHAPES::UNKNOWNSHAPE)
+    {
+        std::cout << "Error: unkown shape entered" << std::endl;
+        result = false;
+    }
+
+    return result;
+}
+
+// Shape detectors "main"
+void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
+{
+    bool parsingSucceeded = parseSpec(aShapeCommand);
+    if (parsingSucceeded == false)
+    {
+        std::cout << "Error: invalid specification entered" << std::endl;
+    }
+
+    draw(); // draw windows and sliders (once)
+
+    while (true)
+    {
+        bool keyPressed = showImages(mVidCap);
+        if (keyPressed)
         {
-            draw(); // draw windows and sliders (once)
-
-            while (true)
-            {
-                // Get new frame
-                if (cap.isOpened())
-                {
-                    cap.grab();
-                    cap.retrieve(mOriginalImage);
-                }
-                reset();     // reset images and values
-                recognize(); // run algorithm
-
-                // Reshow images
-                imshow("Original", mOriginalImage);
-                imshow("Color", mMaskImage);
-                imshow("Result", mDisplayImage);
-
-                // imshow("Brightness", mBrightenedRgbImage);
-                // imshow("Blur", mBlurredImage);
-                imshow("Mask", mMaskImage);
-
-                imshow("Result", mDisplayImage);
-
-                int keyPressed = waitKey(30);
-                if (keyPressed == 27) // ESC key
-                {
-                    destroyAllWindows();
-                    break;
-                }
-            }
-        }
-        else // batchMode == true
-        {
-            reset();              // reset images and values
-            recognize();          // run algorithm
-            printDetectionData(); // Print data
+            break;
         }
     }
-    else
+}
+
+// void batch()
+// {
+//     bool parsingSucceeded = parseSpec(aShapeCommand);
+//     if (parsingSucceeded == false)
+//     {
+//         std::cout << "Error: invalid specification entered" << std::endl;
+//     }
+//     reset();              // reset images and values
+//     recognize();          // run algorithm
+//     printDetectionData(); // Print data
+// }
+
+// void regular()
+// {
+//     bool parsingSucceeded = parseSpec(aShapeCommand);
+//     if (parsingSucceeded == false)
+//     {
+//         std::cout << "Error: invalid specification entered" << std::endl;
+//     }
+
+//     draw(); // draw windows and sliders (once)
+
+//     while (true)
+//     {
+//         bool keyPressed = showImages(mVidCap);
+//         if (keyPressed)
+//         {
+//             break;
+//         }
+//     }
+// }
+
+bool Shapedetector::showImages(VideoCapture cap)
+{
+    bool keyPressed = false;
+
+    // Get new frame
+    cap.grab();
+    cap.retrieve(mOriginalImage);
+
+    reset();     // reset images and values
+    recognize(); // run algorithm
+
+    // Reshow images
+    imshow("Original", mOriginalImage);
+    imshow("Color", mMaskImage);
+    imshow("Result", mDisplayImage);
+
+    // imshow("Brightness", mBrightenedRgbImage);
+    // imshow("Blur", mBlurredImage);
+    imshow("Mask", mMaskImage);
+
+    imshow("Result", mDisplayImage);
+
+    int pressedKey = waitKey(30);
+    if (pressedKey == 27) // ESC key
     {
-        std::cout << "Invalid command" << std::endl;
+        destroyAllWindows();
+        keyPressed = true;
     }
+
+    return keyPressed;
 }
 
 void Shapedetector::reset()
@@ -347,7 +393,7 @@ void Shapedetector::webcamMode(int deviceId)
     std::cout << "### Webcam mode ###" << std::endl;
     std::cout << "Please enter [vorm] [kleur]" << std::endl;
 
-    Shapedetector shapeDetector(capturedImage); // create shape detector
+    setImage(capturedImage); // create shape detector
 
     while (true)
     {
@@ -357,7 +403,7 @@ void Shapedetector::webcamMode(int deviceId)
 
         if (command != EXIT_COMMAND)
         {
-            shapeDetector.handleShapeCommand(command); // Start algorithm
+            handleShapeCommand(command); // Start algorithm
         }
         else if (command == EXIT_COMMAND)
         {
@@ -371,15 +417,11 @@ void Shapedetector::webcamMode(int deviceId)
     }
 }
 
-void Shapedetector::batchMode(std::string imagePath, std::string batchPath)
+void Shapedetector::batchMode(int cameraId, std::string batchPath)
 {
-    mBatchMode = true;
+    initCamera(cameraId);
 
-    if (fileExists(imagePath) == false)
-    {
-        std::cout << "Error: image file does not exist(" << imagePath << ")" << std::endl;
-    }
-    else if (fileExists(batchPath) == false)
+    if (fileExists(batchPath) == false)
     {
         std::cout << "Error: batch file does not exist (" << batchPath << ")" << std::endl;
     }
@@ -394,9 +436,50 @@ void Shapedetector::batchMode(std::string imagePath, std::string batchPath)
         {
             if (line.at(0) != COMMENT_CHARACTER) // if line doesnt start with comment char
             {
-                std::cout << "Specification: " << line << std::endl;
-                handleShapeCommand(line);
+                std::cout << "Detecting \"" << line << "\".." << std::endl;
+
+                bool parsingSucceeded = parseSpec(line);
+                if (parsingSucceeded == false)
+                {
+                    std::cout << "Error: invalid specification entered" << std::endl;
+                }
+
+
+                Mat retrievedFrame;
+                mVidCap.grab();
+                mVidCap.retrieve(retrievedFrame);
+                setImage(retrievedFrame);
+
+                reset(); // reset images and values
+                recognize();          // run algorithm
+                printDetectionData(); // Print data
             }
         }
     }
 }
+
+void Shapedetector::initCamera(int cameraId)
+{
+    mVidCap.open(cameraId);
+
+    if (mVidCap.isOpened() == false)
+    {
+        std::cout << "Error: video capture not opened" << std::endl;
+    }
+}
+
+// void Shapedetector::batchMode()
+// {
+//     getline();
+
+//     while (true)
+//     {
+//         recognize();
+//         imshow();
+
+//         if (ESC)
+//         {
+//             break;
+//         }
+//     }
+// }

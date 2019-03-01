@@ -47,7 +47,7 @@ int main(int argc, char **argv)
         else if (argc == BATCH_ARGCOUNT) // shapedetector [image] [batchfile]
         {
             std::cout << "### batch ###" << std::endl;
-            shapeDetector.batchMode(argv[1], argv[2]);
+            shapeDetector.batchMode(atoi(argv[1]), argv[2]);
         }
     }
     else
