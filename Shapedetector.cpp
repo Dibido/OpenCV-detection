@@ -2,6 +2,11 @@
 #include "Shapedetector.h"
 
 // Constructor
+Shapedetector::Shapedetector()
+{
+    initializeValues();
+}
+
 Shapedetector::Shapedetector(std::string aImageFilePath) : mImagePath(aImageFilePath)
 {
     // Store origininal image

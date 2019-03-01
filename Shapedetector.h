@@ -161,6 +161,7 @@ inline bool fileExists(const std::string &aFilePath)
 class Shapedetector
 {
 public:
+  Shapedetector();
   Shapedetector(std::string aImageFilePath);
   Shapedetector(Mat aImage);
   ~Shapedetector();

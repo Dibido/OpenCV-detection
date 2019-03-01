@@ -21,21 +21,32 @@ int main(int argc, char **argv)
     // ./shapedetector interactive 1
     // ./shapedetector batch ../batch.txt
 
+    /// Constants
+    const std::string EXIT_COMMAND = "exit";
+    const std::string INTERACTIVE_MODE = "interactive";
+    const std::string BATCH_MODE = "batch";
+
+    const int INTERACTIVE_ARGCOUNT = 2;
+    const int BATCH_ARGCOUNT = 3;
+
     if (argc > 1)
     {
         std::string imgPath = argv[1];
-        Shapedetector shapeDetector(argv[1]); // create shape detector
+        Shapedetector shapeDetector; // create shape detector
 
         if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
         {
+            std::cout << "### cmdLine ###" << std::endl;
             shapeDetector.startCommandline();
         }
         else if (argc == INTERACTIVE_ARGCOUNT)
         {
+            std::cout << "### webcam ###" << std::endl;
             shapeDetector.webcamMode(atoi(argv[1]));
         }
         else if (argc == BATCH_ARGCOUNT && fileExists(imgPath)) // shapedetector [image] [batchfile]
         {
+            std::cout << "### batch ###" << std::endl;
             shapeDetector.batchMode(argv[2]);
         }
     }
