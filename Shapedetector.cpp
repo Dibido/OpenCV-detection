@@ -224,6 +224,14 @@ void Shapedetector::printDetectionData()
 {
     printTimeValue(mClockStart, mClockEnd);
     printShapeFound();
+
+    // int time = 0;
+    // std::string nShapes = std::to_string(mCurrentShapeCount);
+    // std::string shape = ShapeToString(mCurrentShape);
+
+    // std::cout << "T = " << time << "\t";
+    // std::cout << "\"" << shape << "\" count = " << nShapes << "\t";
+    // std::cout << "T = " << time << "\t";
 }
 
 void Shapedetector::printTimeValue(std::clock_t aStartTime, std::clock_t aEndTime)
