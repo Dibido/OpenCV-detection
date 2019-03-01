@@ -79,63 +79,6 @@ void Shapedetector::detectCircles(std::vector<Mat> aContours)
   }
 }
 
-void Shapedetector::detectHalfCirclesHough(std::vector<Mat> aContours)
-{
-  Mat cannyImage;
-  Canny(mMaskImage, cannyImage, 200, 20);
-  imshow("canny", cannyImage);
-  std::vector<cv::Vec3f> circles;
-  Mat maskedGreyImage;
-  mGreyImage.copyTo(maskedGreyImage, mMaskImage);
-  HoughCircles(maskedGreyImage, circles, CV_HOUGH_GRADIENT, 1, 60, 200, 20, 0, 0);
-  //compute distance transform:
-  cv::Mat distanceTransform;
-  cv::distanceTransform(255-(cannyImage > 0), distanceTransform, CV_DIST_L2 ,3);
-  // test for semi-circles:
-  float minInlierDist = 2.0f;
-  for (unsigned int i = 0; i < circles.size(); i++)
-  {
-    // test inlier percentage:
-    // sample the circle and check for distance to the next edge
-    unsigned int counter = 0;
-    unsigned int inlier = 0;
-
-    cv::Point2f center((circles[i][0]), (circles[i][1]));
-    float radius = (circles[i][2]);
-
-    // maximal distance of inlier might depend on the size of the circle
-    float maxInlierDist = radius/25.0f;
-    if(maxInlierDist < minInlierDist)
-    {
-      maxInlierDist = minInlierDist;
-    }
-    //TODO: maybe parameter incrementation might depend on circle size!
-    for(float t =0; t < 2 * M_PI; t+= 0.1f) 
-    {
-      counter++;
-      float cX = radius*cos(t) + circles[i][0];
-      float cY = radius*sin(t) + circles[i][1];
-
-      if(distanceTransform.at<float>((int)cY, (int)cX) < maxInlierDist) 
-      {
-        inlier++;
-        cv::circle(mDisplayImage, cv::Point2i((int)cX,(int)cY),3, cv::Scalar(0,255,0));
-      } 
-      else
-      {
-        cv::circle(mDisplayImage, cv::Point2i((int)cX,(int)cY),3, cv::Scalar(255,0,0));
-      }
-      double inlierPercentage = 100.0f*(float)inlier/(float)counter;
-      if(inlierPercentage < mMaxHalfCircleInlierPercentage && inlierPercentage > mMinHalfCircleInlierPercentage)
-      {
-        std::cout << inlierPercentage << std::endl;
-        // drawContours(mDisplayImage, circles, i, Scalar(0, 255, 0));
-        // cv::circle(mDisplayImage, cv::Point2i(cX,cY), radius, cv::Scalar(255,0,0));
-      }
-    }
-  }
-}
-
 void Shapedetector::detectHalfCircles(std::vector<Mat> aContours)
 {
   for (size_t i = 0; i < aContours.size(); i++)
@@ -171,6 +114,7 @@ bool Shapedetector::contourSizeAllowed(Mat aContour)
 std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
 {
   findContours(aShapeMask, mCurrentContours, CV_RETR_EXTERNAL, CHAIN_APPROX_NONE);
+  removeCloseShapes(mCurrentContours);
   switch (aShape)
   {
     case SHAPES::ALL_SHAPES:
@@ -226,7 +170,6 @@ void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
 {
   Point currentCenter;
   Point compareCenter;
-  ;
   for (size_t i = 0; i < aContours.size(); i++)
   {
     //Calculate center
