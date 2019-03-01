@@ -298,61 +298,15 @@ Mat Shapedetector::removeNoise(Mat aImage)
     return result;
 }
 
-void Shapedetector::startCommandline(std::string imgPath)
-{
-    std::cout << "### Interactive mode ###" << std::endl;
-
-    while (true)
-    {
-        std::cout << "Please enter [vorm] [kleur]" << std::endl;
-        std::cout << "> ";
-        std::string command;
-        getline(std::cin, command); // Get command
-
-        if (command != EXIT_COMMAND)
-        {
-            Mat img = imread(imgPath);
-            setImage(img);
-            handleShapeCommand(command); // Start algorithm
-        }
-        else if (command == EXIT_COMMAND)
-        {
-            std::cout << "Closing program.." << std::endl;
-            break;
-        }
-        else
-        {
-            break;
-        }
-    }
-}
-
 void Shapedetector::webcamMode(int deviceId)
 {
-    // Set pretake cam framecount
-    const int WEBCAM_START_IMAGES = 10;
-
-    // Read image from webcam
-    VideoCapture cap;
-    Mat capturedImage;
-    cap.open(deviceId);
-    if (cap.isOpened())
-    {
-        for (size_t i = 0; i < WEBCAM_START_IMAGES; i++)
-        {
-            cap.grab();
-            cap.retrieve(capturedImage);
-        }
-        cap.retrieve(capturedImage);
-        cap.release();
-        imwrite("webcamblocks1.png", capturedImage);
-    }
+    initCamera(deviceId);
 
     // Start webcam mode
     std::cout << "### Webcam mode ###" << std::endl;
     std::cout << "Please enter [vorm] [kleur]" << std::endl;
 
-    setImage(capturedImage); // create shape detector
+    // setImage(capturedImage); // create shape detector
 
     while (true)
     {
@@ -362,7 +316,15 @@ void Shapedetector::webcamMode(int deviceId)
 
         if (command != EXIT_COMMAND)
         {
-            handleShapeCommand(command); // Start algorithm
+            // handleShapeCommand(command); // Start algorithm
+
+            bool parsingSucceeded = parseSpec(command);
+            if (parsingSucceeded == false)
+            {
+                std::cout << "Error: invalid specification entered" << std::endl;
+            }
+
+            detectRealtime();
         }
         else if (command == EXIT_COMMAND)
         {
@@ -403,33 +365,36 @@ void Shapedetector::batchMode(int cameraId, std::string batchPath)
                     std::cout << "Error: invalid specification entered" << std::endl;
                 }
 
-                Mat retrievedFrame;
-                mVidCap.grab();
-                mVidCap.retrieve(retrievedFrame);
-                setImage(retrievedFrame);
-
-                draw();
-
-                while (true)
-                {
-                    Mat retrievedFrame;
-                    mVidCap.grab();
-                    mVidCap.retrieve(retrievedFrame);
-
-                    mOriginalImage = retrievedFrame;
-                    reset();
-
-                    recognize();
-
-                    printDetectionData();
-
-                    bool keyPressed = showImages();
-                    if (keyPressed)
-                    {
-                        break;
-                    }
-                }
+                detectRealtime();
             }
+        }
+    }
+}
+
+void Shapedetector::detectRealtime()
+{
+    Mat retrievedFrame;
+    mVidCap.grab();
+    mVidCap.retrieve(retrievedFrame);
+    setImage(retrievedFrame);
+
+    draw();
+
+    while (true)
+    {
+        Mat retrievedFrame;
+        mVidCap.grab();
+        mVidCap.retrieve(retrievedFrame);
+
+        mOriginalImage = retrievedFrame;
+        reset();
+        recognize();
+        printDetectionData();
+
+        bool keyPressed = showImages();
+        if (keyPressed)
+        {
+            break;
         }
     }
 }
