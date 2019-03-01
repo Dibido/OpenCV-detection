@@ -222,7 +222,7 @@ void Shapedetector::draw()
 
 void Shapedetector::printDetectionData()
 {
-    std::cout << std::fixed << std::setprecision(2) << "\tT = " << 1000.0 * ((double)mClockEnd - (double)mClockStart) / CLOCKS_PER_SEC << " ms\t\t";
+    std::cout << std::fixed << std::setprecision(2) << "\tT = " << ((double)mClockEnd - (double)mClockStart) << "\t\t";
     std::cout << std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape) << std::endl;
 }
 
@@ -290,8 +290,8 @@ void Shapedetector::setShapeCommand(Mat aImage)
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
 {
-    double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
-    const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
+    double calcTime = ((double)aEndTime - (double)aStartTime);
+    const std::string timeText = std::string("T:" + std::to_string(calcTime));
     putText(aImage, timeText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
