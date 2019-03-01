@@ -172,7 +172,7 @@ public:
 
   void startCommandline();
   void webcamMode(int deviceId);
-  void batchMode(std::string fileName);
+  void batchMode(std::string imagePath, std::string batchPath);
 
   /**
      * @brief Handles a single shape command

@@ -371,30 +371,32 @@ void Shapedetector::webcamMode(int deviceId)
     }
 }
 
-void Shapedetector::batchMode(std::string fileName)
+void Shapedetector::batchMode(std::string imagePath, std::string batchPath)
 {
     mBatchMode = true;
 
-    // Start batchmode
-    std::cout << "### Batch mode ###" << std::endl;
-    if (fileExists(fileName))
+    if (fileExists(imagePath) == false)
     {
-        std::string line;
-        std::ifstream batchFile(fileName);
-
-        while (std::getline(batchFile, line))
-        {
-            // Ignore comments
-            if (line.at(0) != COMMENT_CHARACTER)
-            {
-                std::cout << line << std::endl;
-                handleShapeCommand(line);
-            }
-        }
+        std::cout << "Error: image file does not exist(" << imagePath << ")" << std::endl;
+    }
+    else if (fileExists(batchPath) == false)
+    {
+        std::cout << "Error: batch file does not exist (" << batchPath << ")" << std::endl;
     }
     else
     {
-        std::cout << "ERROR - Batchfile does not exist." << std::endl;
-        exit(0);
+        std::cout << "### Batch mode ###" << std::endl;
+
+        std::string line;
+        std::ifstream batchFile(batchPath);
+
+        while (std::getline(batchFile, line)) // for every line in the file
+        {
+            if (line.at(0) != COMMENT_CHARACTER) // if line doesnt start with comment char
+            {
+                std::cout << "Specification: " << line << std::endl;
+                handleShapeCommand(line);
+            }
+        }
     }
 }

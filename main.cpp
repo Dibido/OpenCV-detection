@@ -44,10 +44,10 @@ int main(int argc, char **argv)
             std::cout << "### webcam ###" << std::endl;
             shapeDetector.webcamMode(atoi(argv[1]));
         }
-        else if (argc == BATCH_ARGCOUNT && fileExists(imgPath)) // shapedetector [image] [batchfile]
+        else if (argc == BATCH_ARGCOUNT) // shapedetector [image] [batchfile]
         {
             std::cout << "### batch ###" << std::endl;
-            shapeDetector.batchMode(argv[2]);
+            shapeDetector.batchMode(argv[1], argv[2]);
         }
     }
     else
