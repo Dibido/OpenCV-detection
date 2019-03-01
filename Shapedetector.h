@@ -197,6 +197,7 @@ public:
 private:
   // Program variables
   std::string mImagePath;
+  std::string mCurrentShapeCommand;
 
   // Image matrices
   Mat mHSVImage;
@@ -332,6 +333,12 @@ private:
    * @param aContours the contours in the image
    */
   void detectHalfCirclesHough(std::vector<Mat> aContours);
+
+  /**
+   * @brief Set the shape command in the image
+   * @param aImage the image to set the command in
+   */
+  void setShapeCommand(Mat aImage);
 
   /**
      * @brief Set the X/Y/Area in the center of the shape

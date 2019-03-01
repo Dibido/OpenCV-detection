@@ -70,7 +70,7 @@ void Shapedetector::initializeValues()
     // Set the Contours variables
     mContourCenterMargin = 30;
     mCurrentShapeCount = 0;
-    mEpsilonMultiply = 0.04;
+    mEpsilonMultiply = 0.03;
     mMinContourSize = 500.0;
     mMaxContourSize = 30000.0;
     mMaxHalfCircleInlierPercentage = 60.0;
@@ -129,6 +129,11 @@ bool Shapedetector::parseSpec(const std::string &aShapeCommand)
     {
         std::cout << "Error: unkown shape entered" << std::endl;
         result = false;
+    }
+
+    if (result)
+    {
+      mCurrentShapeCommand = aShapeCommand;
     }
 
     return result;
@@ -268,6 +273,7 @@ void Shapedetector::recognize()
     mClockEnd = std::clock(); // Stop timer
 
     // Show recognition data in displayed image
+    setShapeCommand(mDisplayImage);
     setTimeValue(mDisplayImage, mClockStart, mClockEnd);
     setShapeFound(mDisplayImage);
 }
@@ -276,17 +282,23 @@ void Shapedetector::onChange(int, void *)
 {
 }
 
-void Shapedetector::setShapeFound(Mat aImage)
+void Shapedetector::setShapeCommand(Mat aImage)
 {
-    const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
-    putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
+    const std::string aShapeCommandString = "Shape :" + mCurrentShapeCommand;
+    putText(aImage, aShapeCommandString, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
 void Shapedetector::setTimeValue(Mat aImage, std::clock_t aStartTime, std::clock_t aEndTime)
 {
     double calcTime = 1000.0 * ((double)aEndTime - (double)aStartTime) / CLOCKS_PER_SEC;
     const std::string timeText = std::string("T:" + std::to_string(calcTime) + " ms");
-    putText(aImage, timeText, Point(mTimeXOffset, mTimeYOffset), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
+    putText(aImage, timeText, Point(mTimeXOffset, (mTimeYOffset * 2)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
+}
+
+void Shapedetector::setShapeFound(Mat aImage)
+{
+    const std::string shapeCountText = std::to_string(mCurrentShapeCount) + " " + ShapeToString(mCurrentShape);
+    putText(aImage, shapeCountText, Point(mTimeXOffset, (mTimeYOffset * 3)), FONT_HERSHEY_SIMPLEX, mTextSize, Scalar(0, 0, 0), 1);
 }
 
 Mat Shapedetector::removeNoise(Mat aImage)
