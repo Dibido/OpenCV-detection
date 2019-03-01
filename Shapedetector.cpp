@@ -73,8 +73,6 @@ void Shapedetector::initializeValues()
     mEpsilonMultiply = 0.03;
     mMinContourSize = 500.0;
     mMaxContourSize = 30000.0;
-    mMaxHalfCircleInlierPercentage = 60.0;
-    mMinHalfCircleInlierPercentage = 10.0;
     mMinHalfCirclePercentage = 50.0;
     mMaxHalfCirclePercentage = 72.0;
     mTextOffset = 20;
