@@ -143,7 +143,7 @@ void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
 
     while (true)
     {
-        bool keyPressed = showImages();
+        bool keyPressed = showImages(); // refresh images continiously
         if (keyPressed)
         {
             break;
@@ -155,14 +155,10 @@ bool Shapedetector::showImages()
 {
     bool keyPressed = false;
 
-    // Get new frame
-    mVidCap.grab();
-    mVidCap.retrieve(mOriginalImage);
-
     reset();     // reset images and values
     recognize(); // run algorithm
 
-    // Reshow images
+    // Show images
     imshow("Original", mOriginalImage);
     imshow("Color", mMaskImage);
     imshow("Result", mDisplayImage);
@@ -170,8 +166,6 @@ bool Shapedetector::showImages()
     // imshow("Brightness", mBrightenedRgbImage);
     // imshow("Blur", mBlurredImage);
     // imshow("Mask", mMaskImage);
-
-    imshow("Result", mDisplayImage);
 
     int pressedKey = waitKey(30);
     if (pressedKey == 27) // ESC key
@@ -321,7 +315,7 @@ Mat Shapedetector::removeNoise(Mat aImage)
     return result;
 }
 
-void Shapedetector::startCommandline()
+void Shapedetector::startCommandline(std::string imgPath)
 {
     std::cout << "### Interactive mode ###" << std::endl;
 
@@ -334,6 +328,8 @@ void Shapedetector::startCommandline()
 
         if (command != EXIT_COMMAND)
         {
+            Mat img = imread(imgPath);
+            setImage(img);
             handleShapeCommand(command); // Start algorithm
         }
         else if (command == EXIT_COMMAND)

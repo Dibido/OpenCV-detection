@@ -169,7 +169,7 @@ public:
   void draw();
   void recognize();
 
-  void startCommandline();
+  void startCommandline(std::string imgPath);
   void webcamMode(int deviceId);
   void batchMode(int cameraId, std::string batchPath);
 

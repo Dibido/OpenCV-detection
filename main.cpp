@@ -37,7 +37,7 @@ int main(int argc, char **argv)
         if (argc == INTERACTIVE_ARGCOUNT && fileExists(imgPath)) // shapedetector [image]
         {
             std::cout << "### cmdLine ###" << std::endl;
-            shapeDetector.startCommandline();
+            shapeDetector.startCommandline(imgPath);
         }
         else if (argc == INTERACTIVE_ARGCOUNT)
         {
