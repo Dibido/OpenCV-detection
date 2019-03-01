@@ -55,7 +55,7 @@ void Shapedetector::initializeValues()
     mContrastSliderRange = 200;
     mBlurSliderRange = 31; // must be an odd value
     mNoiseSliderRange = 50;
-    mMinRatioSliderRange = 80;
+    mMinRatioSliderRange = 150;
     mMaxRatioSliderRange = 150;
 
     // Window size
