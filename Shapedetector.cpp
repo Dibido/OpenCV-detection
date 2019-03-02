@@ -4,7 +4,7 @@
 // Constructor
 Shapedetector::Shapedetector()
 {
-  initializeValues();
+    initializeValues();
 }
 
 void Shapedetector::setImage(Mat aImage)
@@ -97,7 +97,7 @@ void Shapedetector::initializeValues()
     mWhiteLimits[1] = Scalar(24, 255, 255);
 }
 
-// Destructor
+// Destructorclean
 Shapedetector::~Shapedetector()
 {
 }
@@ -220,9 +220,10 @@ void Shapedetector::printDetectionData()
 // Starts the detection algorithm
 void Shapedetector::recognize()
 {
-    ////////////////////////////////////////
     // Constrain/manipulate slider values
-    ////////////////////////////////////////
+    mMinSquareRatio = mMinRatioSliderValue / 100.0;
+    mMaxSquareRatio = mMaxRatioSliderValue / 100.0;
+
     if (mNoiseSliderValue == 0)
     {
         mNoiseSliderValue++; // noiseValue must be > 0
@@ -232,10 +233,8 @@ void Shapedetector::recognize()
         mBlurSliderValue++;
     }
 
-    mMinSquareRatio = mMinRatioSliderValue / 100.0;
-    mMaxSquareRatio = mMaxRatioSliderValue / 100.0;
-
-    mClockStart = std::clock(); // Start timer
+    // Start timer
+    mClockStart = std::clock();
 
     //////////////////////
     // Apply filters
@@ -263,7 +262,8 @@ void Shapedetector::recognize()
     // 5. Detect shapes
     detectShape(mCurrentShape, removedNoise);
 
-    mClockEnd = std::clock(); // Stop timer
+    // Stop timer
+    mClockEnd = std::clock();
 
     // Show recognition data in displayed image
     setShapeCommand(mDisplayImage);
@@ -273,6 +273,7 @@ void Shapedetector::recognize()
 
 void Shapedetector::onChange(int, void *)
 {
+    // Slider callback function
 }
 
 void Shapedetector::setShapeCommand(Mat aImage)
