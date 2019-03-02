@@ -9,7 +9,6 @@
 
 /// Local
 #include "Shapedetector.h"
-#include "Camera.h"
 
 int main(int argc, char **argv)
 {
