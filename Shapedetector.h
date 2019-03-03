@@ -24,9 +24,6 @@ using namespace cv;
 
 /// Constants
 const std::string EXIT_COMMAND = "exit";
-const std::string INTERACTIVE_MODE = "interactive";
-const std::string BATCH_MODE = "batch";
-
 const int INTERACTIVE_ARGCOUNT = 2;
 const int BATCH_ARGCOUNT = 3;
 const char COMMENT_CHARACTER = '#';
@@ -200,7 +197,6 @@ public:
   void draw();
   /**
    * @brief Recognize the requested shape
-   * 
    */
   void recognize();
 
@@ -224,18 +220,17 @@ public:
 
   /**
    * @brief Shows the images
-   * @return true The exit key was pressed
-   * @return false The exit key was not pressed
+   * @return if the exit key was pressed
    */
   bool showImages();
+
   /**
    * @brief Parses the current specification
    * @param aShapeCommand The command to parse
-   * @return true The parsing was sucessfull
-   * @return false the parsing failed
+   * @return if the parsing was successful
    */
   bool parseSpec(const std::string &aShapeCommand);
-  
+
   /**
    * @brief Open the camera to make it ready for capturing
    * @param cameraId The id of the camera

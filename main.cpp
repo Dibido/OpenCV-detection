@@ -12,13 +12,6 @@
 
 int main(int argc, char **argv)
 {
-    // COMMANDS
-    // ./shapedetector interactive [device id]
-    // ./shapedetector batch [file]
-
-    // EXAMPLES
-    // ./shapedetector interactive 1
-    // ./shapedetector batch ../batch.txt
     if (argc > 1)
     {
         Shapedetector shapeDetector; // create shape detector
