@@ -238,6 +238,37 @@ public:
   void initCamera(int cameraId);
 
   /**
+   * @brief Calibrate the color ranges
+   */
+  void calibrateColors();
+
+  /**
+   * @brief Load the color values for a certain color
+   * 
+   * @param aColor The color to get the values for
+   * @param aMinScalar The scalar to save the min values to
+   * @param aMaxScalar The scalar to save the max values to
+   */
+  void loadColorValues(COLORS aColor, Scalar& aMinScalar, Scalar& aMaxScalar) const;
+
+  /**
+   * @brief Save the color values for a certain color
+   * 
+   * @param aColor The color to save the values for
+   * @param aMinScalar The min values to save
+   * @param aMaxScalar The max values to save
+   */
+  void saveColorValues(COLORS aColor, Scalar aMinScalar, Scalar aMaxScalar);
+
+  /**
+   * @brief Set the Current Slider Values
+   * 
+   * @param minCalibrationValues The min values to set
+   * @param maxCalibrationValues The max values to set
+   */
+  void setCurrentSliderValues(Scalar minCalibrationValues, Scalar maxCalibrationValues);
+
+  /**
    * @brief Handles the real-time detection algorithm
    */
   void detectRealtime();
@@ -278,6 +309,13 @@ private:
   int mMinRatioSliderValue;
   int mMaxRatioSliderValue;
 
+  int mMinCalibrationHue;
+  int mMaxCalibrationHue;
+  int mMinCalibrationSaturation;
+  int mMaxCalibrationSaturation;
+  int mMinCalibrationValue;
+  int mMaxCalibrationValue;
+
   // Slider ranges
   int mBlurSliderRange;
   int mContrastSliderRange;
@@ -285,6 +323,10 @@ private:
 
   int mMinRatioSliderRange;
   int mMaxRatioSliderRange;
+
+  int mCalibrationHueRange;
+  int mCalibrationSaturationRange;
+  int mCalibrationValueRange;
 
   // Current command values
   COLORS mCurrentColor;

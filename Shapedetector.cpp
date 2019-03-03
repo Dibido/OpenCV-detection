@@ -41,6 +41,17 @@ void Shapedetector::initializeValues()
     mMinRatioSliderValue = 85;
     mMaxRatioSliderValue = 108;
 
+    mMinCalibrationHue = 0;
+    mMaxCalibrationHue = 180;
+    mMinCalibrationSaturation = 0;
+    mMaxCalibrationSaturation = 255;
+    mMinCalibrationValue = 0;
+    mMaxCalibrationValue = 255;
+
+    mCalibrationHueRange = 180;
+    mCalibrationSaturationRange = 255;
+    mCalibrationValueRange = 255;
+    
     mContrastSliderRange = 200;
     mBlurSliderRange = 31; // must be an odd value
     mNoiseSliderRange = 50;
@@ -289,8 +300,12 @@ void Shapedetector::webcamMode(int deviceId)
 
     // Start webcam mode
     std::cout << "### Webcam mode ###" << std::endl;
-    std::cout << "Please enter [vorm] [kleur]" << std::endl;
 
+    //Calibrate colors
+    std::cout << "Calibrate colors" << std::endl;
+    calibrateColors();
+
+    std::cout << "Please enter [vorm] [kleur]" << std::endl;
     while (true)
     {
         std::cout << "> ";
@@ -326,6 +341,9 @@ void Shapedetector::batchMode(int cameraId, std::string batchPath)
     else
     {
         std::cout << "### Batch mode ###" << std::endl;
+
+        std::cout << "Calibrate colors" << std::endl;
+        calibrateColors();
 
         std::string line;
         std::ifstream batchFile(batchPath);
@@ -383,5 +401,147 @@ void Shapedetector::initCamera(int cameraId)
     {
         std::cout << "Error: video capture not opened" << std::endl;
         exit(-1);
+    }
+}
+
+void Shapedetector::calibrateColors()
+{
+  // Create sliders
+  namedWindow("Color sliders");
+  createTrackbar("minHue\t\t", "Color sliders", &mMinCalibrationHue, mCalibrationHueRange, onChange, this);
+  createTrackbar("maxHue\t\t", "Color sliders", &mMaxCalibrationHue, mCalibrationHueRange, onChange, this);
+  createTrackbar("minSaturation\t\t", "Color sliders", &mMinCalibrationSaturation, mCalibrationSaturationRange, onChange, this);
+  createTrackbar("maxSaturation\t\t", "Color sliders", &mMaxCalibrationSaturation, mCalibrationSaturationRange, onChange, this);
+  createTrackbar("minValue\t\t", "Color sliders", &mMinCalibrationValue, mCalibrationValueRange, onChange, this);
+  createTrackbar("maxValue\t\t", "Color sliders", &mMaxCalibrationValue, mCalibrationValueRange, onChange, this);
+  const int sliderWidth = 500;
+  Mat emptyMatrix = Mat::zeros(1, sliderWidth, CV_8U);
+  imshow("Color sliders", emptyMatrix); // put an empty matrix in this window to prevent errors
+  moveWindow("Color sliders", 0, mOriginalImage.rows + 10);
+
+  Mat retrievedFrame;
+  Mat maskedFrame;
+
+  COLORS currentColor;
+  Scalar minCalibrationValues;
+  Scalar maxCalibrationValues;
+
+  // Loop through colors
+  for (size_t i = 0; i < COLORSTRINGS.size() - 1; i++)
+  {
+    // Load saved values
+    currentColor = StringToColor(COLORSTRINGS.at(i));
+    loadColorValues(currentColor, minCalibrationValues, maxCalibrationValues);
+    // Set slider values
+    setCurrentSliderValues(minCalibrationValues, maxCalibrationValues);
+    // Print color to calibrate
+    std::cout << "Calibrating " << COLORSTRINGS.at(i) << " colors." << std::endl;
+    while (true) // Escape pressed
+    {
+      // Capture frame
+      if (mVidCap.isOpened())
+      {
+        mVidCap.grab();
+        mVidCap.retrieve(retrievedFrame);
+      }
+      
+      minCalibrationValues = Scalar(mMinCalibrationHue, mMinCalibrationSaturation, mMinCalibrationValue);
+      maxCalibrationValues = Scalar(mMaxCalibrationHue, mMaxCalibrationSaturation, mMaxCalibrationValue);
+      inRange(retrievedFrame, minCalibrationValues, maxCalibrationValues, maskedFrame);
+
+      imshow("orgininal", retrievedFrame);
+      imshow("mask", maskedFrame);
+
+      int capturedKey = waitKey(30);
+      if (capturedKey == 27) // Escape pressed
+      {
+        break;
+      }
+    }
+    // Save new limits
+    saveColorValues(currentColor, minCalibrationValues, maxCalibrationValues);
+  }
+  destroyAllWindows();
+}
+
+void Shapedetector::setCurrentSliderValues(Scalar minCalibrationValues, Scalar maxCalibrationValues)
+{
+  mMinCalibrationHue = (int)minCalibrationValues[0];
+  mMaxCalibrationHue = (int)maxCalibrationValues[0];
+  mMinCalibrationSaturation = (int)minCalibrationValues[1];
+  mMaxCalibrationSaturation = (int)maxCalibrationValues[1];
+  mMinCalibrationValue = (int)minCalibrationValues[2];
+  mMaxCalibrationValue = (int)maxCalibrationValues[2];
+  cvSetTrackbarPos("minHue\t\t", "Color sliders", mMinCalibrationHue);
+  cvSetTrackbarPos("maxHue\t\t", "Color sliders", mMaxCalibrationHue);
+  cvSetTrackbarPos("minSaturation\t\t", "Color sliders", mMinCalibrationSaturation);
+  cvSetTrackbarPos("maxSaturation\t\t", "Color sliders", mMaxCalibrationSaturation);
+  cvSetTrackbarPos("minValue\t\t", "Color sliders", mMinCalibrationValue);
+  cvSetTrackbarPos("maxValue\t\t", "Color sliders", mMaxCalibrationValue);
+}
+
+void Shapedetector::loadColorValues(COLORS aColor, Scalar& aMinScalar, Scalar& aMaxScalar) const
+{
+  switch (aColor)
+    {
+      case (COLORS::RED):
+        aMinScalar = mRedLimits[0];
+        aMaxScalar = mRedLimits[1];
+        break;
+      case (COLORS::GREEN):
+        aMinScalar = mGreenLimits[0];
+        aMaxScalar = mGreenLimits[1];
+        break;
+      case (COLORS::BLUE):
+        aMinScalar = mBlueLimits[0];
+        aMaxScalar = mBlueLimits[1];
+        break;
+      case (COLORS::BLACK):
+        aMinScalar = mBlackLimits[0];
+        aMaxScalar = mBlackLimits[1];
+        break;
+      case (COLORS::YELLOW):
+        aMinScalar = mYellowLimits[0];
+        aMaxScalar = mYellowLimits[1];
+        break;
+      case (COLORS::WHITE):
+        aMinScalar = mWhiteLimits[0];
+        aMaxScalar = mWhiteLimits[1];
+        break;
+      case (COLORS::UNKNOWNCOLOR):
+        break;
+    }
+}
+
+void Shapedetector::saveColorValues(COLORS aColor, Scalar aMinScalar, Scalar aMaxScalar)
+{
+  switch (aColor)
+    {
+      case (COLORS::RED):
+        mRedLimits[0] = aMinScalar;
+        mRedLimits[1] = aMaxScalar;
+        break;
+      case (COLORS::GREEN):
+        mGreenLimits[0] = aMinScalar;
+        mGreenLimits[1] = aMaxScalar;
+        break;
+      case (COLORS::BLUE):
+        mBlueLimits[0] = aMinScalar;
+        mBlueLimits[1] = aMaxScalar;
+        break;
+      case (COLORS::BLACK):
+        mBlackLimits[0] = aMinScalar;
+        mBlackLimits[1] = aMaxScalar;
+        break;
+      case (COLORS::YELLOW):
+        mYellowLimits[0] = aMinScalar;
+        mYellowLimits[1] = aMaxScalar;
+        break;
+      case (COLORS::WHITE):
+        mWhiteLimits[0] = aMinScalar;
+        mWhiteLimits[1] = aMaxScalar;
+        break;
+      case (COLORS::UNKNOWNCOLOR):
+        break;
     }
 }
