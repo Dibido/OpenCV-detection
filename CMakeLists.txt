@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(shapedetector)
 
-set(CMAKE_CXX_CPPCHECK "cppcheck")
+set(CMAKE_CXX_CPPCHECK "cppcheck" "--enable=all" "--inconclusive")
 
 set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_VERBOSE_MAKEFILE ON)

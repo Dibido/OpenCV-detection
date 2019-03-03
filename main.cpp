@@ -19,15 +19,6 @@ int main(int argc, char **argv)
     // EXAMPLES
     // ./shapedetector interactive 1
     // ./shapedetector batch ../batch.txt
-
-    /// Constants
-    const std::string EXIT_COMMAND = "exit";
-    const std::string INTERACTIVE_MODE = "interactive";
-    const std::string BATCH_MODE = "batch";
-
-    const int INTERACTIVE_ARGCOUNT = 2;
-    const int BATCH_ARGCOUNT = 3;
-
     if (argc > 1)
     {
         Shapedetector shapeDetector; // create shape detector

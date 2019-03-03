@@ -31,7 +31,10 @@ void Shapedetector::reset()
 }
 
 void Shapedetector::initializeValues()
-{
+{   
+    // Set shape and color
+    mCurrentColor = COLORS::UNKNOWNCOLOR;
+    mCurrentShape = SHAPES::UNKNOWNSHAPE;
     // Set the calibration variables
     mContrastSliderValue = 0;
     mBlurSliderValue = 0;
@@ -131,28 +134,6 @@ bool Shapedetector::parseSpec(const std::string &aShapeCommand)
     }
 
     return result;
-}
-
-// Shape detectors "main"
-void Shapedetector::handleShapeCommand(const std::string &aShapeCommand)
-{
-    bool parsingSucceeded = parseSpec(aShapeCommand);
-    if (parsingSucceeded == false)
-    {
-        std::cout << "Error: invalid specification entered" << std::endl;
-    }
-
-    reset();
-    draw(); // draw windows and sliders (once)
-
-    while (true)
-    {
-        bool keyPressed = showImages(); // refresh images continiously
-        if (keyPressed)
-        {
-            break;
-        }
-    }
 }
 
 bool Shapedetector::showImages()
@@ -326,13 +307,9 @@ void Shapedetector::webcamMode(int deviceId)
 
             detectRealtime();
         }
-        else if (command == EXIT_COMMAND)
-        {
-            std::cout << "Closing program.." << std::endl;
-            break;
-        }
         else
         {
+            std::cout << "Closing program.." << std::endl;
             break;
         }
     }
@@ -373,10 +350,10 @@ void Shapedetector::batchMode(int cameraId, std::string batchPath)
 
 void Shapedetector::detectRealtime()
 {
-    Mat retrievedFrame;
+    Mat firstRetrievedFrame;
     mVidCap.grab();
-    mVidCap.retrieve(retrievedFrame);
-    setImage(retrievedFrame);
+    mVidCap.retrieve(firstRetrievedFrame);
+    setImage(firstRetrievedFrame);
 
     draw();
 

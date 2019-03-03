@@ -335,8 +335,6 @@ private:
   double mEpsilonMultiply;
   double mMinContourSize;
   double mMaxContourSize;
-  double mMaxHalfCircleInlierPercentage;
-  double mMinHalfCircleInlierPercentage;
   double mMinHalfCirclePercentage;
   double mMaxHalfCirclePercentage;
 
@@ -396,7 +394,7 @@ private:
    * @param aContour the contour to check
    * @return whether the contour is within the range
    */
-  bool contourSizeAllowed(Mat aContour);
+  bool contourSizeAllowed(Mat aContour) const;
 
   /**
    * @brief finds the halfcircles in an image
@@ -436,7 +434,7 @@ private:
      * @param aImage The image to draw on
      * @param aContour The contours to draw
      */
-  void drawShapeContours(Mat aImage, Mat aContour);
+  static void drawShapeContours(Mat aImage, Mat aContour);
 
   /**
      * @brief Set the count of shapes found
@@ -447,13 +445,13 @@ private:
   /**
    * @brief Get the center point of a contour
    */
-  Point getContourCenter(Mat aContour);
+  static Point getContourCenter(Mat aContour);
 
   /**
    * @brief remove the shapes where the center point is too close to another shape
    * @param aContours the contours to check
    */
-  void removeCloseShapes(std::vector<Mat> &aContours);
+  void removeCloseShapes(std::vector<Mat> &aContours) const;
 
   /**
    * @brief Callback for setting the slider values in the program

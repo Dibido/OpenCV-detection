@@ -11,7 +11,6 @@ void Shapedetector::detectSquares(std::vector<Mat> aContours)
       if (contourSizeAllowed(mCurrentContours.at(i)))
       {
         //Check if it is a square
-        std::vector<Point> rectPoints;
         Rect boundedRect = boundingRect(mCurrentContours.at(i));
         float ratio = (float)boundedRect.width / (float)boundedRect.height;
         if(ratio > mMinSquareRatio && ratio < mMaxSquareRatio)
@@ -90,7 +89,6 @@ void Shapedetector::detectHalfCircles(std::vector<Mat> aContours)
       if (contourSizeAllowed(aContours.at(i)))
       {
         //Check for half circle
-        std::vector<Point> rectPoints;
         Rect boundedRect = boundingRect(aContours.at(i));
         double shapeArea = contourArea(aContours.at(i));
         float squareArea = (float)boundedRect.width * (float)boundedRect.height;
@@ -106,7 +104,7 @@ void Shapedetector::detectHalfCircles(std::vector<Mat> aContours)
   }
 }
 
-bool Shapedetector::contourSizeAllowed(Mat aContour)
+bool Shapedetector::contourSizeAllowed(Mat aContour) const
 {
   return (contourArea(aContour) > mMinContourSize && contourArea(aContour) < mMaxContourSize);
 }
@@ -166,7 +164,7 @@ std::vector<Mat> Shapedetector::detectShape(SHAPES aShape, Mat aShapeMask)
   return mCurrentContours;
 }
 
-void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours)
+void Shapedetector::removeCloseShapes(std::vector<Mat> &aContours) const
 {
   Point currentCenter;
   Point compareCenter;
