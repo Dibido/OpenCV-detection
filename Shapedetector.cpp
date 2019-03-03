@@ -17,8 +17,6 @@ void Shapedetector::setImage(Mat aImage)
     // Convert to necessary formats
     cvtColor(mOriginalImage, mGreyImage, CV_BGR2GRAY);
     cvtColor(mOriginalImage, mHSVImage, CV_BGR2HSV);
-
-    initializeValues();
 }
 
 void Shapedetector::reset()
@@ -35,6 +33,7 @@ void Shapedetector::initializeValues()
     // Set shape and color
     mCurrentColor = COLORS::UNKNOWNCOLOR;
     mCurrentShape = SHAPES::UNKNOWNSHAPE;
+
     // Set the calibration variables
     mContrastSliderValue = 0;
     mBlurSliderValue = 0;
