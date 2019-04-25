@@ -89,14 +89,15 @@ void Shapedetector::initializeValues()
     mTimeYOffset = 20;
 
     // Set the color limits for color detection [0] = Min, [1] = Max
-    mBlueLimits[0] = Scalar(105, 0, 30);
-    mBlueLimits[1] = Scalar(135, 255, 95);
+    mBlueLimits[0] = Scalar(70, 0, 0);
+    mBlueLimits[1] = Scalar(95, 80, 45);
 
-    mGreenLimits[0] = Scalar(0, 0, 10);
-    mGreenLimits[1] = Scalar(102, 255, 70);
+    mGreenLimits[0] = Scalar(75, 0, 0);
+    mGreenLimits[1] = Scalar(125, 255, 50);
 
-    mRedLimits[0] = Scalar(0, 60, 60);
-    mRedLimits[1] = Scalar(10, 255, 255);
+    mRedLimits[0] = Scalar(0, 0, 70);
+    mRedLimits[1] = Scalar(50, 85, 255);
+
     mRedLimits[2] = Scalar(170, 60, 60);
     mRedLimits[3] = Scalar(180, 255, 255);
 
@@ -158,8 +159,8 @@ bool Shapedetector::showImages()
     imshow("Color", mMaskImage);
     imshow("Result", mDisplayImage);
 
-    imshow("Brightness", mBrightenedRgbImage);
-    imshow("Blur", mBlurredImage);
+    // imshow("Brightness", mBrightenedRgbImage);
+    // imshow("Blur", mBlurredImage);
 
     int pressedKey = waitKey(30);
     if (pressedKey == 27) // ESC key
@@ -231,21 +232,23 @@ void Shapedetector::recognize()
     // Apply filters
     //////////////////////
 
-    // 1. Change brightness
-    Mat brightenedBGRImage;
-    Mat brightenedHSVImage;
-    mOriginalImage.convertTo(brightenedBGRImage, -1, 1, mContrastSliderValue);
-    cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
-    mBrightenedRgbImage = brightenedBGRImage;
+    // // 1. Change brightness
+    // Mat brightenedBGRImage;
+    // Mat brightenedHSVImage;
+    // mOriginalImage.convertTo(brightenedBGRImage, -1, 1, mContrastSliderValue);
+    // cvtColor(brightenedBGRImage, brightenedHSVImage, COLOR_BGR2HSV);
+    // mBrightenedRgbImage = brightenedBGRImage;
 
-    // 2. Blur
-    Mat blurredHSVImage;
-    Size blurValue = Size(mBlurSliderValue, mBlurSliderValue);
-    GaussianBlur(brightenedHSVImage, blurredHSVImage, blurValue, 0);
-    cvtColor(blurredHSVImage, mBlurredImage, COLOR_HSV2BGR); // save blurred output
+    // // 2. Blur
+    // Mat blurredHSVImage;
+    // Size blurValue = Size(mBlurSliderValue, mBlurSliderValue);
+    // GaussianBlur(brightenedHSVImage, blurredHSVImage, blurValue, 0);
+    // cvtColor(blurredHSVImage, mBlurredImage, COLOR_HSV2BGR); // save blurred output
 
     // 3. Filter color
-    mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
+    // mMaskImage = detectColor(mCurrentColor, blurredHSVImage);
+    mMaskImage = detectColor(mCurrentColor, mOriginalImage);
+
 
     // 4. Remove noise
     Mat removedNoise = removeNoise(mMaskImage);
