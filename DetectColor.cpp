@@ -20,8 +20,8 @@ Mat Shapedetector::detectColor(COLORS aColor, Mat aImage)
     case COLORS::RED:
     {
       inRange(aImage, mRedLimits[0], mRedLimits[1], resultMask);
-      inRange(aImage, mRedLimits[2], mRedLimits[3], tempMask);
-      bitwise_or(resultMask, tempMask, resultMask);
+      // inRange(aImage, mRedLimits[2], mRedLimits[3], tempMask);
+      // bitwise_or(resultMask, tempMask, resultMask);
       break;
     }
     case COLORS::BLACK:

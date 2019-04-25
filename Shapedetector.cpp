@@ -77,8 +77,8 @@ void Shapedetector::initializeValues()
     mContourCenterMargin = 30;
     mCurrentShapeCount = 0;
     mEpsilonMultiply = 0.03;
-    mMinContourSize = 500.0;
-    mMaxContourSize = 30000.0;
+    mMinContourSize = 300.0;
+    mMaxContourSize = 2800.0;
     mMinHalfCirclePercentage = 50.0;
     mMaxHalfCirclePercentage = 72.0;
     mTextOffset = 20;
